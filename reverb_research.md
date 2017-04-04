@@ -22,8 +22,8 @@ This is a much more natural decay. Allpasses inside of delayed feedback loops is
 
 
 ## Second reference
-*Julius O. Smith III. ÖUS420/EE367A Lecture 3 Artificial Reverberation and Spatialization.
-https://ccrma.standard.edu/~jos/Reverb/
+*Julius O. Smith III. MUS420/EE367A Lecture 3 Artificial Reverberation and Spatialization.
+https://ccrma.stanford.edu/~jos/Reverb/
 2014-03-24*
 
 "Early reflections are sparse and span a short time, tapped delay lines (TDL) are often used to 
