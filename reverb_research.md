@@ -33,3 +33,21 @@ Often, they are worked into the late-reverberation simulation. A transposed tapp
 
 Late reverberation has to have a smooth decay and a smooth frequency reponse of impulse reponse. 
 10,000 echoes/s or more are necessary for a smooth reponse."
+
+
+### Parameters
+#### Dry/Wet
+Gains for effect(reverb) output called *Wet*, and gain for the original signal called *Dry*
+
+#### Early reflections
+Important to be able to identify room size quickly.
+
+#### Late reverberation size
+Length of the reverberation
+
+#### Damping/EQ
+Higher frequencies "dies" earlier than lower frequencies, correctly implemented will make the reverberation sound more real.
+
+http://wiki.audacityteam.org/wiki/Principles_of_Reverb
+ 
+http://en.audiofanzine.com/getting-started/editorial/articles/using-reverb-step-by-step.html
