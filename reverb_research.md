@@ -12,15 +12,17 @@ Such reverbs often sound bad: ringing, metallic, tec.
 * the paralle comb filters into series allpasses
 * series allpass delays 
 	* reverberator using 5 allpass delays in series. It provides a less-colored sound.
+	
 Schroeder describes a way of mixing the input and output of the series allpass reverberator -> resulting sound
-is allpass. Algo: single delay line, feeding into 5 series allpass delays and an allpas feedback around the structure.
+is allpass. 
+Algo: single delay line, feeding into 5 series allpass delays and an allpas feedback around the structure.
 This reverberator have a non-exponential decay. 
 It increases the outer allpass -> the echo increases with time, the reverb time is longer.
 This is a much more natural decay. Allpasses inside of delayed feedback loops is fundamental."
 
 
 ## Second reference
-*Julius O. Smith III. ÖUS420/EE367A Lecture 3 Artificial Reverberation and Spatialization.
+*Julius O. Smith III. Ã–US420/EE367A Lecture 3 Artificial Reverberation and Spatialization.
 https://ccrma.standard.edu/~jos/Reverb/
 2014-03-24*
 
