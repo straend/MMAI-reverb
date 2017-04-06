@@ -59,16 +59,16 @@ April 26, 2016*
 
 ### Why use the Room reverb?
 * Description
-Simulates ambient rooms of square structure and low ceilings.  
+	* Simulates ambient rooms of square structure and low ceilings.  
 Usually most effective with short RT60 times and can contribute to the clarity and presence of an individual instrument or a mix.  
 Effective use can "lift" an instrument out of a dense mix better than simply turning it up.  
 Variations of small, medium, large refer to the size of the emulated room and are independent of RT60 time.  
 Best used as a subtle effect.
 * Uses
-Snares, marching drums, percussion, drum kits, vocals, piano, acoustic guitar, ethnic ensembles, strings.  
+	* Snares, marching drums, percussion, drum kits, vocals, piano, acoustic guitar, ethnic ensembles, strings.  
 Inherent high diffusion may make signals with fast transients (percussion, piano, guitar) sound grainy at long RT60 times.
 
-** realistic, natural and lots of different sounds can be tested **
+**realistic, natural and lots of different sounds can be tested**
 
 ### Parameters
 #### Dry/Wet
