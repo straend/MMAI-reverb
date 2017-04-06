@@ -34,6 +34,21 @@ Often, they are worked into the late-reverberation simulation. A transposed tapp
 Late reverberation has to have a smooth decay and a smooth frequency reponse of impulse reponse. 
 10,000 echoes/s or more are necessary for a smooth reponse."
 
+### The good question
+*Do I want a natural, reality based sound to emulate listening in a real room?  
+What size and kind of room?*
+*Or do I want to use reverb more as a noticeable effect and ear candy for the listener?*
+
+### Different types of reverbs
+*MIXING & MASTERING. Mixing with Reverb: How to Use Reverb for Depth Without Creating a Mess.
+http://ledgernote.com/columns/mixing-mastering/mixing-with-reverb/
+April 26, 2016*
+* Room
+* Hall
+* Chamber
+* Spring 
+* Plate
+
 
 ### Parameters
 #### Dry/Wet
