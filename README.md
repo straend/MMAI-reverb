@@ -1,4 +1,4 @@
-# MMAI-reverb
+# MMAI-reverb [![Build Status](https://travis-ci.org/straend/MMAI-reverb.svg?branch=master)](https://travis-ci.org/straend/MMAI-reverb)
 
 ## Purpose:
 Implement a reverb algorithm in C/C++.
