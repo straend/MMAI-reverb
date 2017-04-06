@@ -47,6 +47,8 @@ Length of the reverberation
 
 #### Damping/EQ
 Higher frequencies "dies" earlier than lower frequencies, correctly implemented will make the reverberation sound more real.
+"Generally speaking, damping is expressed as a ratio. For example, a damping of 1/2 on a two second reverb means the high frequencies disappear after just one second, while the rest of the signal extends for another second."
+" In that case you could use a shelving filter in the low end to emphasize the sound's warmth as well as to create a larger sense of space. Boosting the highs on the other hand will produce a flashy surreal effect. Be careful not to be excessive with it or you risk drowning your mix in a reverb mush."
 
 http://wiki.audacityteam.org/wiki/Principles_of_Reverb
  
