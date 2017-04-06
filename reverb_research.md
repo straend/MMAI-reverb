@@ -37,6 +37,11 @@ Often, they are worked into the late-reverberation simulation. A transposed tapp
 Late reverberation has to have a smooth decay and a smooth frequency reponse of impulse reponse. 
 10,000 echoes/s or more are necessary for a smooth reponse."
 
+*http://dsp.stackexchange.com/questions/2792/high-quality-reverb-algorithm*
+"Feedback delay networks are definitely the way to go. The original Schroeder algorithms with all passes 
+and comb filters suffers from "spectral thinning" which makes it metallic sounding. You need to dial in 
+frequency dependent attenuation on the different delay lines that's representative of the reverb time (as a function of frequency). Early reflections can be done through a tapped delay line also with some frequency dependent attenuation and a few diffusers to de-correlate them. Doing stereo also requires some means of de-correlation."
+
 ### Digital reverberation
 Basic steps to create a digital reverberation with suggested data to simulate a concert hall from 
 Dodge & Jerse, “Computer Music”.
@@ -69,6 +74,7 @@ Best used as a subtle effect.
 Inherent high diffusion may make signals with fast transients (percussion, piano, guitar) sound grainy at long RT60 times.
 
 **realistic, natural and lots of different sounds can be tested**
+http://www.retrosynth.com/~analoguediehard/studio/effects/digitalreverb.html 
 
 ### Parameters
 #### Dry/Wet
