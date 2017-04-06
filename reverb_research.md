@@ -101,3 +101,6 @@ Delay values should not interfere with each other ie. be multiplies of another o
 Slight variations on delay/decay time for left and right channel
 
 (RayTracing reverb..)
+
+Combination of Moorer and Schroeder
+http://arqen.com/wp-content/docs/Hybrid-Convolution-Algorithmic-Reverb.pdf
