@@ -1,6 +1,6 @@
 # Research about reverb
 
-## First reference
+## Why to choose a reverb of Schroeder?
 *SEAN COSTELLO. Shroeder Reverbs: The Forgotten Algorithm. 
 https://valhalladsp.com/2009/05/30/schroeder-reverbs-the-forgotten-algorithm/
 May 30, 2009*
@@ -21,7 +21,7 @@ It increases the outer allpass -> the echo increases with time, the reverb time 
 This is a much more natural decay. Allpasses inside of delayed feedback loops is fundamental."
 
 
-## Second reference
+## How to create a reverb?
 *Julius O. Smith III. MUS420/EE367A Lecture 3 Artificial Reverberation and Spatialization.
 https://ccrma.stanford.edu/~jos/Reverb/
 2014-03-24*
