@@ -51,3 +51,10 @@ Higher frequencies "dies" earlier than lower frequencies, correctly implemented 
 http://wiki.audacityteam.org/wiki/Principles_of_Reverb
  
 http://en.audiofanzine.com/getting-started/editorial/articles/using-reverb-step-by-step.html
+
+## Random Notes
+Delay values should not interfere with each other ie. be multiplies of another one, -> use prime numbers 
+  
+Slight variations on delay/decay time for left and right channel
+
+(RayTracing reverb..)
