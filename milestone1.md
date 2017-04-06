@@ -43,6 +43,8 @@
                └──────┘  └─────────┘                     └────┘
 ```
 
+![Moorer model](https://christianfloisand.files.wordpress.com/2012/10/moorerdesign1.png)
+
 ## Group organization
 * Tasks
 * Organization
