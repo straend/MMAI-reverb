@@ -37,6 +37,11 @@ Often, they are worked into the late-reverberation simulation. A transposed tapp
 Late reverberation has to have a smooth decay and a smooth frequency reponse of impulse reponse. 
 10,000 echoes/s or more are necessary for a smooth reponse."
 
+### Digital reverberation
+Basic steps to create a digital reverberation with suggested data to simulate a concert hall from 
+Dodge & Jerse, “Computer Music”.
+https://christianfloisand.wordpress.com/2012/09/04/digital-reverberation/
+
 ### The good question
 *Do I want a natural, reality based sound to emulate listening in a real room?  
 What size and kind of room?*
@@ -52,6 +57,18 @@ April 26, 2016*
 * Spring 
 * Plate
 
+### Why use the Room reverb?
+* Description
+Simulates ambient rooms of square structure and low ceilings.  
+Usually most effective with short RT60 times and can contribute to the clarity and presence of an individual instrument or a mix.  
+Effective use can "lift" an instrument out of a dense mix better than simply turning it up.  
+Variations of small, medium, large refer to the size of the emulated room and are independent of RT60 time.  
+Best used as a subtle effect.
+* Uses
+Snares, marching drums, percussion, drum kits, vocals, piano, acoustic guitar, ethnic ensembles, strings.  
+Inherent high diffusion may make signals with fast transients (percussion, piano, guitar) sound grainy at long RT60 times.
+
+** realistic, natural and lots of different sounds can be tested **
 
 ### Parameters
 #### Dry/Wet
