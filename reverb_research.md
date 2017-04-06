@@ -20,6 +20,9 @@ This reverberator have a non-exponential decay.
 It increases the outer allpass -> the echo increases with time, the reverb time is longer.
 This is a much more natural decay. Allpasses inside of delayed feedback loops is fundamental."
 
+1962 AES Paper, “Natural Sounding Artificial Reverberation
+http://charlesames.net/pdf/MRSchroeder/artificial-reverb.pdf
+
 
 ## How to create a reverb?
 *Julius O. Smith III. MUS420/EE367A Lecture 3 Artificial Reverberation and Spatialization.
