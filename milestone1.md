@@ -42,8 +42,8 @@
             └─▶│Delay │─▶│ Moorer  │───Late Reverb──────▶│    │
                └──────┘  └─────────┘                     └────┘
 ```
-
-![Moorer model](https://christianfloisand.files.wordpress.com/2012/10/moorerdesign1.png)
+### Moorer design
+![Moorer design](https://christianfloisand.files.wordpress.com/2012/10/moorerdesign1.png)
 
 ## Group organization
 * Tasks
