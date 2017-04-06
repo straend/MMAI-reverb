@@ -21,9 +21,9 @@
     - dampens higher frequencies more
     - more natural sound
     - "more comb filters > more better reverberation"
-    - gives a varmer sound
-* Different decay times for left and right for a more naturla sound
-* (Replacing the Pararell Combs with a FDN?)
+    - gives a warmer sound
+* Different decay times for left and right for a more natural sound
+* (Replacing the Pararell Combs with a Feedback Delay Network?)
 
 ```
                                                          ┌────┐
