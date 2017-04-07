@@ -47,14 +47,10 @@
 
 ## Group organization
 * Tasks
-> See issues
+> Using [Issues](https://github.com/straend/MMAI-reverb/issues)
 * Organization
-> See the assignment of issues and the schedule section in the wiki part
+> See the assignment of [issues](https://github.com/straend/MMAI-reverb/issues) and the [schedule](https://github.com/straend/MMAI-reverb/wiki/Schedule) section in the wiki part
 * Schedule
-> In the schedule section of the wiki part are displayed times of internal meetings 
-and the schedule of our internal tasks' deadlines
+> In the [schedule](https://github.com/straend/MMAI-reverb/wiki/Schedule) section of the wiki part are displayed times of internal meetings 
+and the [schedule](https://github.com/straend/MMAI-reverb/wiki/Schedule) of our internal tasks' deadlines
 
-
-topic | meeting time
-------|-------------
-First meeting | Tuesday 7pm to 9pm
