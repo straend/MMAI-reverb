@@ -47,8 +47,13 @@
 
 ## Group organization
 * Tasks
+> See issues
 * Organization
+> See the assignment of issues and the schedule section in the wiki part
 * Schedule
+> In the schedule section of the wiki part are displayed times of internal meetings 
+and the schedule of our internal tasks' deadlines
+
 
 topic | meeting time
 ------|-------------
