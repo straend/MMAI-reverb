@@ -1,5 +1,18 @@
 language: c
-script: make
+
+# Build step
+script: 
+  - cd build
+  - cmake .. && make
+
+# Compile with both clang and gcc
 compiler:
   - clang
   - gcc
+
+# We need libsndfile and portaudio to compile
+addons:
+  apt:
+    packages:
+      - libsndfile1
+      - libportaudio2
