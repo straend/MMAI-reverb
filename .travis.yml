@@ -15,4 +15,6 @@ addons:
   apt:
     packages:
       - libsndfile1
+      - libsndfile1-dev
       - libportaudio2
+      - libportaudio19-dev

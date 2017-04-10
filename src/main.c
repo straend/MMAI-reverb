@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <sndfile.h>
+#include "sndfile.h"
 #include "portaudio.h"
 
 typedef struct {
