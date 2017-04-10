@@ -23,6 +23,9 @@ This is a much more natural decay. Allpasses inside of delayed feedback loops is
 1962 AES Paper, “Natural Sounding Artificial Reverberation
 http://charlesames.net/pdf/MRSchroeder/artificial-reverb.pdf
 
+## Why to choose a Moorer reverb?
+Good response with less computations due to the allpass filters used in the feedback paths.
+reverb.pdf
 
 ## How to create a reverb?
 *Julius O. Smith III. MUS420/EE367A Lecture 3 Artificial Reverberation and Spatialization.
