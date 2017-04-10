@@ -20,9 +20,10 @@ Implement a reverb algorithm in C/C++.
     * portaudio
     
 ## Milestones
-* Week 15: project plan
-  * What have we researched about the reverbs?
-  * How will we implement a reverb?
+* Week 15: [project plan](https://github.com/straend/MMAI-reverb/blob/master/docs/milestone1.md)
+   * What have we researched about the reverbs?
+      * [research](https://github.com/straend/MMAI-reverb/blob/master/docs/reverb_research.md)
+   * How will we implement a reverb?
     * interface description
     * base algorithm
   * How will we share the work between us?
