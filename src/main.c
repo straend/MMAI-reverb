@@ -125,9 +125,7 @@ int main (int argc, char *argv[])
   sf_close (infile);
   data.samples = sfinfo.frames;
 
-
   fake_reverb(samples, &sfinfo);
-
 
   // Save audio
   if( NULL != outfilename) {
