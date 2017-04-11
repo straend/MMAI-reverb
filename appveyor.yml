@@ -1,5 +1,7 @@
 # Automatic build file for Windows
 
+os: Visual Studio 2015
+
 # environment variables
 environment:
   # my_var1: value1
