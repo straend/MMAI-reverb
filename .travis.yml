@@ -26,3 +26,15 @@ addons:
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update          ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install portaudio libsndfile; fi
+
+# Release
+deploy:
+  provider: releases
+  user: "GITHUB USERNAME"
+  password: "GITHUB PASSWORD"
+  file:
+     - "FILE 1"
+     - "FILE 2"
+  skip_cleanup: true
+  on:
+    tags: true
