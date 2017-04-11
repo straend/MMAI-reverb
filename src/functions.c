@@ -25,6 +25,19 @@ void delay_line(double *buffer){
 	}
 }
 
+static double D[M]; /* initialized to zero */
+static long ptr=0;  /* read-write offset */
+
+double delayline(double x)
+{
+  double y = D[ptr]; /* read operation */
+  D[ptr++] = x;      /* write operation */
+  if (ptr >= M) { 
+	ptr -= M; 
+  } /* wrap ptr */
+  return y;
+}
+
 /*
 void revmodel::processreplace(float *inputL, float *inputR, 
   float *outputL, float *outputR, long numsamples, int skip)
