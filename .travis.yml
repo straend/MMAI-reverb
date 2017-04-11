@@ -25,6 +25,6 @@ deploy:
   provider: releases
   api_key:
     secure: dD7rbK4p+SHOdMzI7oDfO9WM06C6fXlI6s7gnUNOJAwYxZNU8pNITL2I64i522ODkDCTbftdq0Nxhd6SABwHIR9/+NLhNy231C4PMxVEiMUmr/dja9/mJLnvpMg5rLcJfqxOOVLk3l+B1XvUtJ9DnviHU3dhWD8aZXRFviAskEv3C5LuyOJuDB9yiYFQyXqyc+XeYex2rRS1/nao1FzqYMectq+P5AGVMI3jFUvNTnTJpnLWkyOpO/PZt+BC0lnfENu9QbB3nuYa8GJdYDZ0jarSsoCwsmnbeFXK6VCsFN6RQSH1uhujWuAPnm+DMDCmBVfiyK3KBrSs7u3qqE91//tDHzXDIKM/OR45Z8IhIOcpphUKQTf74voeKquaehDY10W3WjBmhMhi3XOIDirvf6vCdErbXDxx+KrhxEHCFD/pqb+25yRkVMg+v8CcksxgVF9Ino+jZ+a3h5CS7zmFqfG/K5Qkw7z5fhN7NXH+KtqsHxeBr86LWm/XEa9sGqwWRWlNjQezLlKmZnXSf48E2u2SDWckyM+Dl2vG932ZOiDWKExhNYZ/+g5jD3cn7CvDoRw0ygTRnfEM87rYqAMFhnrWlgMYB70S5CUjqZavc+iQilxnNZUf/sI3O5XHfAToDD+W6ApreCL04LT7EE4ACWhgqKfo8Gr57wTa/uk8gjQ=
-  file: build/mmai
+  file: mmai
   on:
     repo: straend/MMAI-reverb
