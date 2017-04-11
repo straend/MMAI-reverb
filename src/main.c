@@ -127,7 +127,7 @@ int main (int argc, char *argv[])
   for (i=step;i<sfinfo.frames/2;i++){
     samples[ i*2]   += samples[(i-step)*2] * 0.1;
     samples[ i*2+1] += samples[(i-step)*2+1] * 0.1;
-    
+
   }
 
   // Save audio
@@ -146,8 +146,8 @@ int main (int argc, char *argv[])
   outputParameters.hostApiSpecificStreamInfo = NULL;
 
 
-  printf("SampleRate: %d\n",sfinfo.samplerate);
-  printf("Samples   : %lld\n",sfinfo.frames);
+  printf("SampleRate: %d\n", sfinfo.samplerate);
+  printf("Samples   : %ld\n", sfinfo.frames);
 
   err = Pa_OpenStream(
     &stream,
