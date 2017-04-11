@@ -3,24 +3,26 @@ branches:
   only:
   - master
 os:
-- linux
-- osx
+  - linux
+  - osx
 script:
-- cd build
-- cmake .. && make
+  - cd build
+  - cmake .. && make
 compiler:
-- clang
-- gcc
+  - clang
+  - gcc
 addons:
   apt:
     packages:
-    - libsndfile1
-    - libsndfile1-dev
-    - libportaudio2
-    - portaudio19-dev
+      - libsndfile1
+      - libsndfile1-dev
+      - libportaudio2
+      - portaudio19-dev
+
 before_install:
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update          ; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install portaudio libsndfile; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update          ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install portaudio libsndfile; fi
+
 deploy:
   provider: releases
   api_key:
