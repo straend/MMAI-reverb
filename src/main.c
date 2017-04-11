@@ -8,6 +8,8 @@
 #include "sndfile.h"
 #include "portaudio.h"
 
+#include "reverb_fake.h"
+
 typedef struct {
   uint32_t c_sample;
   sf_count_t samples;
@@ -122,13 +124,10 @@ int main (int argc, char *argv[])
   sf_readf_float (infile, samples, sfinfo.frames);
   sf_close (infile);
   data.samples = sfinfo.frames;
-  
-  uint32_t step= 1024;
-  for (i=step;i<sfinfo.frames/2;i++){
-    samples[ i*2]   += samples[(i-step)*2] * 0.1;
-    samples[ i*2+1] += samples[(i-step)*2+1] * 0.1;
 
-  }
+
+  fake_reverb(samples, &sfinfo);
+
 
   // Save audio
   if( NULL != outfilename) {
