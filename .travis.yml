@@ -1,43 +1,30 @@
 language: c
-
 branches:
   only:
-    - master
+  - master
 os:
-  - linux
-  - osx
-
-# Build step
-script: 
-  - cd build
-  - cmake .. && make
-
-# Compile with both clang and gcc
+- linux
+- osx
+script:
+- cd build
+- cmake .. && make
 compiler:
-  - clang
-  - gcc
-
-# We need libsndfile and portaudio to compile
+- clang
+- gcc
 addons:
   apt:
     packages:
-      - libsndfile1
-      - libsndfile1-dev
-      - libportaudio2
-      - portaudio19-dev
-
+    - libsndfile1
+    - libsndfile1-dev
+    - libportaudio2
+    - portaudio19-dev
 before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update          ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install portaudio libsndfile; fi
-
-# Release
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update          ; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install portaudio libsndfile; fi
 deploy:
   provider: releases
   api_key:
-    secure: "eXkGm25L2xgTi8neAr5z96ngunzU6fM043kU9qBgcJ2bnpzbvaIv5DWlSytKnortJqUnDUmi4Drz0rl5z/o1JBwUSCCGleVWa5BPYSTeOXdAanGsaIH8RhOSVs5hjWCSQL43Lc9TX49RoPw0vyrgnvPyZ+r7qkCaQwJrJEOgH1QaTAC15yCowM82K/XoIlWCMG3hqnHEYNyEl9VKZTmWg7aHUl0ejwh30qj92XayUG33kCiWLkTP57X6DeaTFhiFkqwER9cESZnQMJRRp14WG46VUQVpnyY0VV2VXaMbWx8shI24Bs9onJutuSeSL2xCitecFHjxB6ae2k5DVwpa4O6kUUvnd5z/1IFwvAqUfk3gnQHq3oejAT0m/s7JNUM2pjrY0XJgo6smwWj8c81XCRvgVelUVnpmsyKHygIBQ8QXrsk11NkUGHEdFDcyyTFp+3hqRgUmoZmC97o5GGp9g6GDFX8Q8XsJqOQPKXg/jRb6c1umRBV590Oh2X6ZQIEsHQhuSR9RKoqvozxmSM1IIo8BVh4zZVBVMQYP+aGE/xtooMeQO77Go6Q4WSz/zWqsJBIl+Jc+KhurGg16t07ZZpmb8pEg/tiUiW558hDOKttzaGc6S2QIENolFb37vmaijWttK5pya6Dma1N+/33yuJ25IKhJsowHCKRU8f0Uiy4="
-  file:
-     - "build/mmai"
-  skip_cleanup: true
+    secure: dD7rbK4p+SHOdMzI7oDfO9WM06C6fXlI6s7gnUNOJAwYxZNU8pNITL2I64i522ODkDCTbftdq0Nxhd6SABwHIR9/+NLhNy231C4PMxVEiMUmr/dja9/mJLnvpMg5rLcJfqxOOVLk3l+B1XvUtJ9DnviHU3dhWD8aZXRFviAskEv3C5LuyOJuDB9yiYFQyXqyc+XeYex2rRS1/nao1FzqYMectq+P5AGVMI3jFUvNTnTJpnLWkyOpO/PZt+BC0lnfENu9QbB3nuYa8GJdYDZ0jarSsoCwsmnbeFXK6VCsFN6RQSH1uhujWuAPnm+DMDCmBVfiyK3KBrSs7u3qqE91//tDHzXDIKM/OR45Z8IhIOcpphUKQTf74voeKquaehDY10W3WjBmhMhi3XOIDirvf6vCdErbXDxx+KrhxEHCFD/pqb+25yRkVMg+v8CcksxgVF9Ino+jZ+a3h5CS7zmFqfG/K5Qkw7z5fhN7NXH+KtqsHxeBr86LWm/XEa9sGqwWRWlNjQezLlKmZnXSf48E2u2SDWckyM+Dl2vG932ZOiDWKExhNYZ/+g5jD3cn7CvDoRw0ygTRnfEM87rYqAMFhnrWlgMYB70S5CUjqZavc+iQilxnNZUf/sI3O5XHfAToDD+W6ApreCL04LT7EE4ACWhgqKfo8Gr57wTa/uk8gjQ=
+  file: build/mmai
   on:
-    tags: true
-    all_branches: true
+    repo: straend/MMAI-reverb
