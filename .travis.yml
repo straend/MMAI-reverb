@@ -1,5 +1,8 @@
 language: c
 
+branches:
+  only:
+    - master
 os:
   - linux
   - osx
@@ -30,11 +33,10 @@ before_install:
 # Release
 deploy:
   provider: releases
-  user: "GITHUB USERNAME"
-  password: "GITHUB PASSWORD"
+  api_key:
+    secure: "eXkGm25L2xgTi8neAr5z96ngunzU6fM043kU9qBgcJ2bnpzbvaIv5DWlSytKnortJqUnDUmi4Drz0rl5z/o1JBwUSCCGleVWa5BPYSTeOXdAanGsaIH8RhOSVs5hjWCSQL43Lc9TX49RoPw0vyrgnvPyZ+r7qkCaQwJrJEOgH1QaTAC15yCowM82K/XoIlWCMG3hqnHEYNyEl9VKZTmWg7aHUl0ejwh30qj92XayUG33kCiWLkTP57X6DeaTFhiFkqwER9cESZnQMJRRp14WG46VUQVpnyY0VV2VXaMbWx8shI24Bs9onJutuSeSL2xCitecFHjxB6ae2k5DVwpa4O6kUUvnd5z/1IFwvAqUfk3gnQHq3oejAT0m/s7JNUM2pjrY0XJgo6smwWj8c81XCRvgVelUVnpmsyKHygIBQ8QXrsk11NkUGHEdFDcyyTFp+3hqRgUmoZmC97o5GGp9g6GDFX8Q8XsJqOQPKXg/jRb6c1umRBV590Oh2X6ZQIEsHQhuSR9RKoqvozxmSM1IIo8BVh4zZVBVMQYP+aGE/xtooMeQO77Go6Q4WSz/zWqsJBIl+Jc+KhurGg16t07ZZpmb8pEg/tiUiW558hDOKttzaGc6S2QIENolFb37vmaijWttK5pya6Dma1N+/33yuJ25IKhJsowHCKRU8f0Uiy4="
   file:
-     - "FILE 1"
-     - "FILE 2"
+     - "build/mmai"
   skip_cleanup: true
   on:
     tags: true
