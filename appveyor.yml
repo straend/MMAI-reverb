@@ -1,25 +1,20 @@
 # Automatic build file for Windows
-
-# environment variables
-environment:
-  # my_var1: value1
-  # my_var2: value2
-
-install:
+version: 1.0.{build}
+# build Configuration, i.e. Debug, Release, etc.
+configuration: Release
+os: Visual Studio 2017
 
 # build platform, i.e. x86, x64, Any CPU. This setting is optional.
 platform:
   - x86
   - x64
 
-# build Configuration, i.e. Debug, Release, etc.
-configuration: 
-  - Debug
-  - Release
+before_build:
+  - nuget restore
 
 build:
  # parallel: true                  # enable MSBuild parallel builds
- # project: MyTestAzureCS.sln      # path to Visual Studio solution or project
+ project: MMAI-reverb.sln      # path to Visual Studio solution or project
  # publish_wap: true               # package Web Application Projects (WAP) for Web Deploy
  # publish_wap_xcopy: true         # package Web Application Projects (WAP) for XCopy deployment
  # publish_azure: true             # package Azure Cloud Service projects and push to artifacts
@@ -30,20 +25,11 @@ build:
   # MSBuild verbosity level
   verbosity: normal
 
-# scripts to run before build
-before_build:
-
-# scripts to run *after* solution is built and *before* automatic packaging occurs (web apps, NuGet packages, Azure Cloud Services)
-before_package:
-
-# scripts to run after build
-after_build:
-
-# to run your custom scripts instead of automatic MSBuild
-build_script:
-
-# to disable automatic builds
-#build: off
+# artifacts configuration
+artifacts:
+  - path: MMAI-reverb\bin #which files and folders to be uploaded to AppVeyor cloud storage during the build, relative to the root of repository
+    name: release
+    type: c
 
 # Release
 deploy:
@@ -56,5 +42,5 @@ deploy:
   draft: false
   prerelease: false
   on:
-    branch: master                 # release from master branch only
+    branch: Candice_coding                 # release from a secondary branch
     appveyor_repo_tag: true        # deploy on tag push only
