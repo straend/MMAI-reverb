@@ -9,13 +9,15 @@
 #include "portaudio.h"
 
 #include "reverb_fake.h"
+#include "functions.h"
+#include "delay_stuff.h"
 
 typedef struct {
   uint32_t c_sample;
   sf_count_t samples;
 } paTestData;
 
-float *samples;
+double *samples;
 
 #define FRAMES_PER_BUFFER (64)
 volatile bool keep_playing = false;
@@ -37,7 +39,7 @@ static int paCallback(
 
   for( i=0; i<framesPerBuffer; i++ ) {
     *out++ = samples[data->c_sample++];  // left
-    *out++ = samples[data->c_sample++];  // right
+    //*out++ = samples[data->c_sample++];  // right
 
     if(data->c_sample >= data->samples) {
       data->c_sample = 0;
@@ -120,12 +122,14 @@ int main (int argc, char *argv[])
   }
 
   // Read samples to array
-  samples = malloc(sizeof(float) *  sfinfo.frames * sfinfo.channels);
-  sf_readf_float (infile, samples, sfinfo.frames);
+  samples = malloc(sizeof(double) *  sfinfo.frames * sfinfo.channels);
+  sf_readf_double (infile, samples, sfinfo.frames);
   sf_close (infile);
   data.samples = sfinfo.frames;
 
-  fake_reverb(samples, &sfinfo);
+  //fake_reverb(samples, &sfinfo);
+  //reverb_time(samples, &sfinfo);
+  just_delays(samples, &sfinfo);
 
   // Save audio
   if( NULL != outfilename) {

@@ -5,18 +5,26 @@
 * 			Basic functions to generate a reverb.			 *
 *															 *
 **************************************************************/
-#include "function.h"
-
+#include "functions.h"
+#include "sndfile.h"
+#include <stdint.h>
+#include <math.h>
+#include <stdlib.h>
+#include <string.h>
 
 //#define B0 		1 //other constant value
 //#define AM		1 //other constant value
 
-static double D[M]; /* initialized to zero */
-					// table which contains values of the input sound
+double b0;
+double am;
+//static double D[M]; /* initialized to zero */
+static double *D;					// table which contains values of the input sound
 static long ptr=0;  /* read-write offset */
+uint32_t M;
 
-static double paramB0 = []; //values of b0 for different comb filters
-static double paramAm = []; //values of Am for different comb filters
+// Combfilters
+static double *paramB0; //[] = {123, 523, 345, 222, 164,253}; //values of b0 for different comb filters
+static double *paramAm; //[] = {0.6, 0.7, 0.3, 0.5, 0.2, 0.3}; //values of Am for different comb filters
 
 // function of a delay line
 double delayline(double x)
@@ -31,9 +39,17 @@ double delayline(double x)
 
 // function of an allpass filter 
 // found from a transfer function
-double allpass_filter(double input double b0, double am){
+double allpass_filter(double input, double b0, double am){
 	double tmp = delayline(input);
 	return (b0 + tmp) / (1 + am*tmp);
+}
+
+ double get_gain(double t, double RVT);
+
+// g = 0.001 ^(tau / RVT)
+ double get_gain(double t, double RVT)
+{
+    return pow(0.001, t/RVT);
 }
 
 // function of a feedback comb filter 
@@ -46,19 +62,63 @@ double feedback_comb_filter(double input, double b0, double am){
 }
 
 
-double sum_comb_filters(double input, double paramB0[], double paramAm[]){
+double sum_comb_filters(double input, double *paramB0, double *paramAm){
 	// initialisation
 	double sum = 0;
-	
-	for (int i = 0; i < 6; i++) {
+
+    for (int i = 0; i < 1; i++) {
 		sum += feedback_comb_filter(input, paramB0[i], paramAm[i]);
 	}
-	
 	return sum;
 }
 
 double late_reflections_network(double input){
-	return delayline(allpass_filter(sum_comb_filters(input, paramB0, paramAm), b0, am));
+
+    //return allpass_filter(input, b0, am);
+    return sum_comb_filters(input, paramB0, paramAm);
+
+    return delayline(
+            allpass_filter(
+                    sum_comb_filters(input, paramB0, paramAm)
+                    , b0, am
+            )
+    );
+}
+
+void reverb_time(double *samples, SF_INFO *sfInfo)
+{
+    double rvt[] = {1.1, 1.5, 1.8, 1.2};
+    double tau[] = {0.0297, 0.0371, 0.0411,0.0437};
+
+    uint32_t  filters=sizeof(rvt)/ sizeof(rvt[0]);
+    paramB0 = calloc(sizeof(rvt[0]), filters);
+    paramAm = calloc(sizeof(rvt[0]), filters);
+
+    for(uint32_t i=0;i< filters;i++){
+        //paramB0[i] = rvt[i];
+        //paramB0[i] = rvt[i];
+        paramB0[i] = tau[i];
+
+        //paramB0[i] = get_gain(tau[i], rvt[i]);
+
+        //paramAm[i] = get_gain(tau[i], rvt[i]);
+        //paramAm[i] = tau[i];
+        paramAm[i] = rvt[i];
+    }
+    am = 0.005;
+    b0 = 0.09683;
+    D = samples;
+    M = sfInfo->frames*sfInfo->channels;
+    double *d = calloc(sizeof(double), M);
+    memcpy(d, D, M* sizeof(double));
+    for (uint32_t i=0; i<M; i++){
+        samples[i] += late_reflections_network(samples[i]);
+    }
+    M= 200;
+    for (uint32_t i=0; i<M; i++){
+        printf("%f \t%f\n",samples[i], d[i]);
+    }
+
 }
 
 
