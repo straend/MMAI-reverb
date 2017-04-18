@@ -56,13 +56,18 @@ void just_delays(double *input, SF_INFO *sf)
     init_delay(&dl1, 50, input, sf, 0.667);
     init_delay(&dl2, 200, input, sf, 0.33);
     init_delay(&dl3, 100, input, sf, 0.13);
+    double dry = 0.3;
+    double wet = 0.1;
 
     uint32_t M = sf->frames*sf->channels;
     for (uint32_t i=0; i<M; i++){
         double x = input[i];
-        input[i] += process_delay(&dl1, x);
-        input[i] += process_delay(&dl2, x);
-        input[i] += process_delay(&dl3, x);
+        double processed = 0;
+        processed += process_delay(&dl1, x);
+        processed += process_delay(&dl2, x);
+        processed += process_delay(&dl3, x);
+
+        input[i] = x*dry + processed*wet;
     }
     free(dl1.delay);
     free(dl2.delay);
