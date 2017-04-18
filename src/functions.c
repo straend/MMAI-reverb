@@ -5,11 +5,13 @@
 * 			Basic functions to generate a reverb.			 *
 *															 *
 **************************************************************/
+
 #include "function.h"
 
 
 //#define B0 		1 //other constant value
 //#define AM		1 //other constant value
+#define NUMBER_TAPPED_DELAY_LINES	4
 
 static double D[M]; /* initialized to zero */
 					// table which contains values of the input sound
@@ -18,13 +20,25 @@ static long ptr=0;  /* read-write offset */
 static double paramB0 = []; //values of b0 for different comb filters
 static double paramAm = []; //values of Am for different comb filters
 
+static double paramM = []; //values of M for the tapped delay line function
+static double paramBM = []; //values of BM for the tapped delay line function
+
 // function of a delay line
-double delayline(double x)
-{
+double delayline(double x){
   double y = D[ptr]; /* read operation */
   D[ptr++] = x;      /* write operation */
   if (ptr >= M) { 
 	ptr -= M; 
+  } /* wrap ptr */
+  return y;
+}
+
+// function of a delay line
+double delayline_tap(double x, double paramM){
+  double y = D[ptr]; /* read operation */
+  D[ptr++] = x;      /* write operation */
+  if (ptr >= paramM) { 
+	ptr -= paramM; 
   } /* wrap ptr */
   return y;
 }
@@ -61,7 +75,21 @@ double late_reflections_network(double input){
 	return delayline(allpass_filter(sum_comb_filters(input, paramB0, paramAm), b0, am));
 }
 
+double tapped_delay_line(double input, double paramM[], double paramBM[]){
+	// initialisation
+	double result = 0;
+	
+	for (int i = 0; i <NUMBER_TAPPED_DELAY_LINES; i++){
+		result += paramBM[i]*delayline_tap(input, paramM[i]);
+	}
+	return result;
+}
 
+double Moorer(double input){
+	double early_reflec = tapped_delay_line(input, paramM, paramBM);
+	double late_reflec = late_reflections_network(early_reflec);
+	return final_result = early_reflec + late_reflec;
+}
 
 // produce 	a reverb effect in an existing array
 // delay_line
