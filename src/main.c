@@ -15,6 +15,7 @@
 typedef struct {
   uint32_t c_sample;
   sf_count_t samples;
+  uint8_t  channels;
 } paTestData;
 
 double *samples;
@@ -38,8 +39,8 @@ static int paCallback(
   (void) inputBuffer;
 
   for( i=0; i<framesPerBuffer; i++ ) {
-    *out++ = samples[data->c_sample++];  // left
-    *out++ = samples[data->c_sample++];  // right
+    for(uint8_t c=0;c<data->channels;c++)
+      *out++ = samples[data->c_sample++];  // left
 
     if(data->c_sample >= data->samples) {
       data->c_sample = 0;
@@ -112,32 +113,30 @@ int main (int argc, char *argv[])
     return 1 ;
   };
 
-  if( NULL != outfilename ) {
+
+  // Read samples to array
+  samples = malloc(sizeof(double) *  sfinfo.frames * sfinfo.channels);
+  sf_readf_double (infile, samples, sfinfo.frames);
+  sf_close (infile);
+  data.samples = sfinfo.frames*sfinfo.channels;
+  data.channels = sfinfo.channels;
+
+    //fake_reverb(samples, &sfinfo);
+  try_moorer(samples, &sfinfo);
+
+  // Save audio
+  if( NULL != outfilename) {
     // Copy audioinfo and create outfile
     memcpy(&sfinfo_out, &sfinfo, sizeof(SF_INFO));
     if ((outfile = sf_open(outfilename, SFM_WRITE, &sfinfo_out)) == NULL) {
       printf("Could not open '%s' for writing: %s\n", outfilename, sf_strerror(NULL));
       return 1;
     }
-  }
 
-  // Read samples to array
-  samples = malloc(sizeof(double) *  sfinfo.frames * sfinfo.channels);
-  sf_readf_double (infile, samples, sfinfo.frames);
-  sf_close (infile);
-  data.samples = sfinfo.frames;
-
-  //fake_reverb(samples, &sfinfo);
-  //reverb_time(samples, &sfinfo);
-  //just_delays(samples, &sfinfo);
-  //allpass(samples, &sfinfo);
-  comb_filters(samples, &sfinfo);
-
-  // Save audio
-  if( NULL != outfilename) {
     printf("Writing output to: %s\n", outfilename);
     sfinfo_out.frames = sfinfo.frames;
-    sf_writef_float(outfile, samples, sfinfo_out.frames);
+
+    sf_writef_double(outfile, samples, sfinfo_out.frames);
     sf_close(outfile);
   }
 
