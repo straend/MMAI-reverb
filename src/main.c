@@ -39,7 +39,7 @@ static int paCallback(
 
   for( i=0; i<framesPerBuffer; i++ ) {
     *out++ = samples[data->c_sample++];  // left
-    //*out++ = samples[data->c_sample++];  // right
+    *out++ = samples[data->c_sample++];  // right
 
     if(data->c_sample >= data->samples) {
       data->c_sample = 0;
@@ -129,7 +129,9 @@ int main (int argc, char *argv[])
 
   //fake_reverb(samples, &sfinfo);
   //reverb_time(samples, &sfinfo);
-  just_delays(samples, &sfinfo);
+  //just_delays(samples, &sfinfo);
+  //allpass(samples, &sfinfo);
+  comb_filters(samples, &sfinfo);
 
   // Save audio
   if( NULL != outfilename) {

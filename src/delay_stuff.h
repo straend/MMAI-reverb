@@ -8,5 +8,7 @@
 #include "sndfile.h"
 
 void just_delays(double *input, SF_INFO *sf);
+void allpass(double *input, SF_INFO *sf);
+void comb_filters(double *input, SF_INFO *sf);
 
 #endif //MMAI_DELAY_STUFF_H
