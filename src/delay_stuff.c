@@ -106,6 +106,8 @@ void allpass(double *input, SF_INFO *sf){
 		double x = input[i];
         double processed = 0;
         processed += process_allpass(&dla, x);
+        
+        input[i] = processed;
     }
 	free(dla.delay);
 	
@@ -118,12 +120,12 @@ void comb_filters(double *input, SF_INFO *sf){
 	delay_line_s dlc3;
 	delay_line_s dlc4;
 	delay_line_s dlc5;
-	init_delay(&dlcb, 75, input, sf, 0.6);
-	init_delay(&dlc1, 100, input, sf, 0.5);
-	init_delay(&dlc2, 33, input, sf, 0.8);
-	init_delay(&dlc3, 63, input, sf, 0.1);
-	init_delay(&dlc4, 22, input, sf, 0.22);
-	init_delay(&dlc5, 80, input, sf, 0.66);
+	init_delay(&dlcb, 50, input, sf, 0.841);
+	init_delay(&dlc1, 56, input, sf, 0.379);
+	init_delay(&dlc2, 61, input, sf, 0.289);
+	init_delay(&dlc3, 68, input, sf, 0.1);
+	init_delay(&dlc4, 72, input, sf, 0.22);
+	init_delay(&dlc5, 78, input, sf, 0.66);
 	
 	uint32_t M = sf->frames*sf->channels;
     for (uint32_t i=0; i<M; i++){
@@ -135,6 +137,8 @@ void comb_filters(double *input, SF_INFO *sf){
         processed += process_comb(&dlc3, x);
         processed += process_comb(&dlc4, x);
         processed += process_comb(&dlc5, x);
+		
+		input[i] = processed;
     }
 	free(dlcb.delay);
 	free(dlc1.delay);

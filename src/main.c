@@ -137,7 +137,7 @@ int main (int argc, char *argv[])
   if( NULL != outfilename) {
     printf("Writing output to: %s\n", outfilename);
     sfinfo_out.frames = sfinfo.frames;
-    sf_writef_float(outfile, samples, sfinfo_out.frames);
+    sf_writef_double(outfile, samples, sfinfo_out.frames);
     sf_close(outfile);
   }
 
