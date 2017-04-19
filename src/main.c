@@ -135,7 +135,10 @@ int main (int argc, char *argv[])
 
     printf("Writing output to: %s\n", outfilename);
     sfinfo_out.frames = sfinfo.frames;
+<<<<<<< HEAD
+=======
 
+>>>>>>> 6d8e99049bf017794328e627adc00ef87531179a
     sf_writef_double(outfile, samples, sfinfo_out.frames);
     sf_close(outfile);
   }
