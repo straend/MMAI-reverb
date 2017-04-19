@@ -13,4 +13,4 @@ include_directories(${PORTAUDIO_INCLUDE_DIRS})
 set(SOURCE_FILES src/main.c src/reverb_fake.c src/reverb_fake.h src/delay_stuff.c src/delay_stuff.h)
 add_executable(mmai ${SOURCE_FILES})
 
-target_link_libraries(mmai sndfile portaudio)
+target_link_libraries(mmai sndfile portaudio m)
