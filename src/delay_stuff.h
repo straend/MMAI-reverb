@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <math.h>
+#include <time.h>
 
 void just_delays(double *input, SF_INFO *sf);
 void allpass(double *input, SF_INFO *sf);
