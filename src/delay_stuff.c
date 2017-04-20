@@ -13,9 +13,10 @@
 //values extracted from impulse measurements in Boston Symphony Hall
 //These are the delay times for each of the 18 tap readIndex
 //The first tap is unit gain for the input signal, not shown here
-const double ER_TAPS[18] = {
-    0.0043, 0.0215, 0.0225, 0.0268, 0.0270, 0.0298, 0.0458, 0.0485, 0.0572, 0.0587, 0.0595, 0.0612,
-    0.0707, 0.0708, 0.0726, 0.0741, 0.0753, 0.0797
+// in milliseconds
+const double ER_TAPS[] = {
+    43, 21.5, 22.5, 26.8, 27.0, 29.8, 45.8, 48.5, 57.2, 58.7, 59.5, 61.2,
+    70.7, 70.8, 72.6, 74.1, 75.3, 79.7
 };
 //Early reflection GAIN values to apply to each of the above taps
 const double ER_GAINS[18] = {
@@ -98,10 +99,10 @@ double process_comb(delay_line_s *dl, double x)
 #define TAPS (18)
 void just_delays(double *input, SF_INFO *sf)
 {
-    delay_line_s dl[TAPS];
-    for(uint8_t d=0;d<TAPS;d++){
-        init_delay(&dl[d], ER_TAPS[d]*1000, input, sf, ER_GAINS[d]);
-    }
+  delay_line_s dl[TAPS];
+  for(uint8_t d=0;d<TAPS;d++){
+    init_delay(&dl[d], ER_TAPS[d], input, sf, ER_GAINS[d]);
+  }
 
     uint32_t M = sf->frames*sf->channels;
     for (uint32_t i=0; i<M; i++){
