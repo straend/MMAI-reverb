@@ -30,7 +30,7 @@ Implement a reverb algorithm in C/C++.
     * tasks
     * responsability
     * schedule   
- * Week 16: first version of the reverberation
+ * Week 16: [first version of the reverberation](https://straend.github.io/MMAI-reverb/Milestone2.html)
     * working algorithm
        * can be non real-time and/ or non cross-platform
     * the executable has to be uploaded to GitHub's releases
