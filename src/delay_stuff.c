@@ -19,11 +19,14 @@ const double ER_TAPS[] = {
     70.7, 70.8, 72.6, 74.1, 75.3, 79.7
 };
 //Early reflection GAIN values to apply to each of the above taps
-const double ER_GAINS[18] = {
+const double ER_GAINS[] = {
     0.841, 0.504, 0.491, 0.379, 0.380, 0.346, 0.289, 0.272, 0.192, 0.193, 0.217, 0.181, 0.180,
     0.181, 0.176, 0.142, 0.167, 0.134
 };
+#define TAPS (18)
 
+#define COMBS (6)
+// also in milliseconds
 const double comb_delays[] = {50, 56, 61, 68, 72, 78};
 const double comb_damp_freq[] = {1942, 1362, 1312, 1574, 981, 1036};
 
@@ -96,7 +99,6 @@ double process_comb(delay_line_s *dl, double x)
     }
     return y;
 }
-#define TAPS (18)
 void just_delays(double *input, SF_INFO *sf)
 {
   delay_line_s dl[TAPS];
@@ -104,7 +106,7 @@ void just_delays(double *input, SF_INFO *sf)
     init_delay(&dl[d], ER_TAPS[d], input, sf, ER_GAINS[d]);
   }
 
-    uint32_t M = sf->frames*sf->channels;
+  uint32_t M = sf->frames*sf->channels;
     for (uint32_t i=0; i<M; i++){
         double x = input[i];
         double processed = 0;
@@ -126,7 +128,7 @@ void allpass(double *input, SF_INFO *sf){
 
 	uint32_t M = sf->frames*sf->channels;
     for (uint32_t i=0; i<M; i++){
-		double x = input[i];
+		    double x = input[i];
         double processed = 0;
         processed += process_allpass(&dla, x);
         input[i] = processed;
@@ -139,9 +141,9 @@ void allpass(double *input, SF_INFO *sf){
 void comb_filters(double *input, SF_INFO *sf) {
   float rt60 = 3.0;
 
-  delay_line_s comb[6];
+  delay_line_s comb[COMBS];
 
-  for (uint8_t c = 0; c < 6; c++) {
+  for (uint8_t c = 0; c < COMBS; c++) {
     double g = pow(10.0, ((-3.0 * comb_delays[c]) / (rt60 * 1000.0)));
     g=0.2;
     init_delay_comb(&comb[c], comb_delays[c], input, sf, g, comb_damp_freq[c]);
@@ -151,14 +153,119 @@ void comb_filters(double *input, SF_INFO *sf) {
   for (uint32_t i = 0; i < M; i++) {
     double x = input[i];
     double processed = 0;
-    for (uint8_t c = 0; c < 6; c++) {
+    for (uint8_t c = 0; c < COMBS; c++) {
       processed += process_comb(&comb[c], x);
     }
     input[i] = processed;
   }
-  for (uint8_t c = 0; c < 6; c++) {
+  for (uint8_t c = 0; c < COMBS; c++) {
     free(comb[c].delay);
   }
+}
+delay_line_s dl[TAPS];
+delay_line_s comb[COMBS];
+delay_line_s dla;
+
+void init_early(double *samples, SF_INFO *sfinfo)
+{
+  for(uint8_t d=0;d<TAPS;d++){
+    init_delay(&dl[d], ER_TAPS[d], samples, sfinfo, ER_GAINS[d]);
+  }
+}
+
+void init_combs(double *samples, SF_INFO *sfinfo)
+{
+  float rt60 = 3.0;
+
+  for (uint8_t c = 0; c < COMBS; c++) {
+    double g = pow(10.0, ((-3.0 * comb_delays[c]) / (rt60 * 1000.0)));
+    g=0.2;
+    init_delay_comb(&comb[c], comb_delays[c], samples, sfinfo, g, comb_damp_freq[c]);
+  }
+}
+
+void init_allpass(double *samples, SF_INFO *sfinfo)
+{
+  init_delay(&dla, 6, samples, sfinfo, 0.707);
+}
+
+void process_early_iter(double *input, const uint32_t iter)
+{
+  for (uint32_t i=0; i<iter; i++){
+    double x = input[i];
+    double processed = 0;
+    for(uint8_t d=0;d<TAPS;d++){
+      double y = process_delay(&dl[d], x);
+      processed += y;
+
+    }
+    input[i] = processed;
+  }
+}
+void process_comb_iter(double *input, const uint32_t iter)
+{
+  for (uint32_t i=0; i<iter; i++) {
+    double x = input[i];
+    double processed = 0;
+    for (uint8_t c = 0; c < COMBS; c++) {
+      processed += process_comb(&comb[c], x);
+    }
+    input[i] = processed;
+  }
+}
+void process_allpass_iter(double *input, const uint32_t iter)
+{
+  for (uint32_t i=0; i<iter; i++) {
+    double processed = 0;
+    double x = input[i];
+    processed += process_allpass(&dla, x);
+    input[i] = processed;
+  }
+}
+
+double *early_reflections;
+double *late_reflections;
+uint32_t cur_iter=0;
+
+void init_moorer(double *samples, SF_INFO *sfinfo, const uint32_t iter)
+{
+  init_early(samples, sfinfo);
+  init_combs(samples, sfinfo);
+  init_allpass(samples, sfinfo);
+  early_reflections=calloc(sizeof(double), iter);
+  late_reflections=calloc(sizeof(double), iter);
+  cur_iter = 0;
+}
+
+void process_moorer(const uint32_t iter, double *samples)
+{
+  memcpy(early_reflections, samples+cur_iter, sizeof(double)*iter);
+  process_early_iter(early_reflections, iter);
+  memcpy(late_reflections, early_reflections, sizeof(double)*iter);
+  process_comb_iter(late_reflections, iter);
+  process_allpass_iter(late_reflections, iter);
+
+  double dry = 0.3;
+  double wet = 1-dry;
+
+  for (uint32_t i=0; i<iter; i++) {
+    samples[i+cur_iter] = samples[i+cur_iter]*dry + late_reflections[i]*wet;
+  }
+  cur_iter+=iter;
+}
+
+void finnish_moorer()
+{
+  for(uint8_t d=0;d<TAPS;d++){
+    free(dl[d].delay);
+  }
+  for (uint8_t c = 0; c < COMBS; c++) {
+    free(comb[c].delay);
+  }
+  free(dla.delay);
+
+  free(early_reflections);
+  free(late_reflections);
 }
 
 void try_moorer(double *samples, SF_INFO *sfinfo)
@@ -173,7 +280,7 @@ void try_moorer(double *samples, SF_INFO *sfinfo)
     comb_filters(late_reflections, sfinfo);
     allpass(late_reflections, sfinfo);
 
-    double dry=0.7;
+    double dry=0.3;
     double wet=1-dry;
     for(uint32_t i=0; i<sfinfo->channels*sfinfo->frames;i++){
         samples[i] = samples[i] * dry + late_reflections[i]*wet;
