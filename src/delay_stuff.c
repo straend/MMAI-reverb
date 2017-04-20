@@ -160,10 +160,9 @@ void comb_filters(double *input, SF_INFO *sf) {
   }
 }
 
-void try_moorer(double **samples, SF_INFO *sfinfo)
+void try_moorer(double *samples, SF_INFO *sfinfo)
 {
-    clock_t start_all, end_early, end_memcpy, end_comb, end_allpass, end_use, end_all;
-    start_all = clock();
+
     double *early_reflections=calloc(sizeof(double), sfinfo->channels*sfinfo->frames);
     memcpy(early_reflections, samples, sfinfo->channels*sfinfo->frames * sizeof(double));
     just_delays(early_reflections, sfinfo);
@@ -176,7 +175,7 @@ void try_moorer(double **samples, SF_INFO *sfinfo)
     double dry=0.7;
     double wet=1-dry;
     for(uint32_t i=0; i<sfinfo->channels*sfinfo->frames;i++){
-        *(samples)[i] = *(samples)[i] * dry + late_reflections[i]*wet;
+        samples[i] = samples[i] * dry + late_reflections[i]*wet;
     }
 
     free(early_reflections);
