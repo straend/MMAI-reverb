@@ -61,12 +61,15 @@ double process_delay(delay_line_s *dl, double x)
 double process_allpass(delay_line_s *dl, double x)
 {
     double y = dl->delay[dl->ptr];
-    dl->delay[dl->ptr++] = (dl->gain + (x + (y * dl->gain)))/(1 + (dl->gain * (x + (y * dl->gain))));
+    //dl->delay[dl->ptr++] = (dl->gain + (x + (y * dl->gain)))/(1 + (dl->gain * (x + (y * dl->gain))));
+    double to_dl = x + (dl->gain*y);
+    double out = -dl->gain*to_dl + y;
+    dl->delay[dl->ptr++] = to_dl;
 
     if (dl->ptr >= dl->delay_samples) {
         dl->ptr -= dl->delay_samples;
     }
-    return y;
+    return out;
 }
 
 double process_comb(delay_line_s *dl, double x)

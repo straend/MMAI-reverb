@@ -121,12 +121,6 @@ int main (int argc, char *argv[])
   data.samples = sfinfo.frames*sfinfo.channels;
   data.channels = sfinfo.channels;
 
-    //fake_reverb(samples, &sfinfo);
-  //try_moorer(&samples, &sfinfo);
-
-
-
-
     clock_t start_all, end_early, end_memcpy, end_comb, end_allpass, end_use, end_all;
     start_all = clock();
     double *early_reflections=calloc(sizeof(double), sfinfo.channels*sfinfo.frames);
@@ -137,13 +131,12 @@ int main (int argc, char *argv[])
 
     memcpy(late_reflections, early_reflections, sfinfo.channels*sfinfo.frames * sizeof(double));
     comb_filters(late_reflections, &sfinfo);
-    //allpass(late_reflections, &sfinfo);
+    allpass(late_reflections, &sfinfo);
 
     double dry=0.3;
     double wet=1-dry;
     for(uint32_t i=0; i<sfinfo.channels*sfinfo.frames;i++){
         samples[i] = samples[i] * dry + late_reflections[i]*wet;
-        //samples[i] = samples[i] * dry +early_reflections[i]*wet;
     }
 
     free(early_reflections);
