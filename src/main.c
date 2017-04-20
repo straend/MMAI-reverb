@@ -40,10 +40,10 @@ volatile bool keep_playing = false;
     (void) timeInfo;
     (void) statusFlags;
     (void) inputBuffer;
+    process_moorer(framesPerBuffer, data->buffer);
 
     for( i=0; i<framesPerBuffer; i++ ) {
         for(uint8_t c=0;c<data->channels;c++)
-            //*out++ = samples[data->c_sample++];
             *out++ = data->buffer[data->c_sample++];
         if(data->c_sample >= data->samples) {
             data->c_sample = 0;
@@ -122,23 +122,8 @@ int main (int argc, char *argv[])
     data.channels = sfinfo.channels;
     data.buffer = samples;
     
-    try_moorer(samples, &sfinfo);
-
-
-    // Save audio
-    if( NULL != outfilename) {
-        // Copy audioinfo and create outfile
-        memcpy(&sfinfo_out, &sfinfo, sizeof(SF_INFO));
-        if ((outfile = sf_open(outfilename, SFM_WRITE, &sfinfo_out)) == NULL) {
-            printf("Could not open '%s' for writing: %s\n", outfilename, sf_strerror(NULL));
-            return 1;
-        }
-
-        printf("Writing output to: %s\n", outfilename);
-        sfinfo_out.frames = sfinfo.frames;
-        sf_writef_double(outfile, samples, sfinfo_out.frames);
-        sf_close(outfile);
-    }
+    //try_moorer(samples, &sfinfo);
+    init_moorer(samples, &sfinfo, FRAMES_PER_BUFFER);
 
     // Play audio
     outputParameters.channelCount = sfinfo.channels;
@@ -176,10 +161,28 @@ int main (int argc, char *argv[])
     keep_playing = true;
     while (keep_playing);
 
-    err = Pa_StopStream( stream );
-    err = Pa_CloseStream( stream );
-    Pa_Terminate();
 
-    free(samples);
-    return 0 ;
+  // Save audio
+  if( NULL != outfilename) {
+    // Copy audioinfo and create outfile
+    memcpy(&sfinfo_out, &sfinfo, sizeof(SF_INFO));
+    if ((outfile = sf_open(outfilename, SFM_WRITE, &sfinfo_out)) == NULL) {
+      printf("Could not open '%s' for writing: %s\n", outfilename, sf_strerror(NULL));
+      return 1;
+    }
+
+    printf("Writing output to: %s\n", outfilename);
+    sfinfo_out.frames = sfinfo.frames;
+    sf_writef_double(outfile, samples, sfinfo_out.frames);
+    sf_close(outfile);
+  }
+
+
+  err = Pa_StopStream( stream );
+  err = Pa_CloseStream( stream );
+  Pa_Terminate();
+  finnish_moorer();
+
+  free(samples);
+  return 0 ;
 }
