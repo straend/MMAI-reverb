@@ -122,9 +122,35 @@ int main (int argc, char *argv[])
   data.channels = sfinfo.channels;
 
     //fake_reverb(samples, &sfinfo);
-  try_moorer(samples, &sfinfo);
+  //try_moorer(&samples, &sfinfo);
 
-  // Save audio
+
+
+
+    clock_t start_all, end_early, end_memcpy, end_comb, end_allpass, end_use, end_all;
+    start_all = clock();
+    double *early_reflections=calloc(sizeof(double), sfinfo.channels*sfinfo.frames);
+    memcpy(early_reflections, samples, sfinfo.channels*sfinfo.frames * sizeof(double));
+    just_delays(early_reflections, &sfinfo);
+
+    double *late_reflections=calloc(sizeof(double), sfinfo.channels*sfinfo.frames);
+
+    memcpy(late_reflections, early_reflections, sfinfo.channels*sfinfo.frames * sizeof(double));
+    comb_filters(late_reflections, &sfinfo);
+    //allpass(late_reflections, &sfinfo);
+
+    double dry=0.3;
+    double wet=1-dry;
+    for(uint32_t i=0; i<sfinfo.channels*sfinfo.frames;i++){
+        samples[i] = samples[i] * dry + late_reflections[i]*wet;
+        //samples[i] = samples[i] * dry +early_reflections[i]*wet;
+    }
+
+    free(early_reflections);
+    free(late_reflections);
+
+
+    // Save audio
   if( NULL != outfilename) {
     // Copy audioinfo and create outfile
     memcpy(&sfinfo_out, &sfinfo, sizeof(SF_INFO));

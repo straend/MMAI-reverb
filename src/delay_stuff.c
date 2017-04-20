@@ -7,16 +7,6 @@
 
 
 
-typedef struct{
-    double *input;
-    double delay_ms;
-    uint32_t delay_samples;
-    uint32_t ptr;
-    SF_INFO *sf;
-    double *delay;
-    uint32_t  p;
-    double gain;
-} delay_line_s;
 
 // https://github.com/keithhearne/VSTPlugins/blob/master/MoorerReverb/Source/ERTapDelayLine.h
 //Early Reflection TAP delay values as presented in Moorer's 1979 paper
@@ -34,7 +24,7 @@ const double ER_GAINS[18] = {
 };
 
 const double comb_delays[] = {50, 56, 61, 68, 72, 78};
-
+const double comb_damp_freq[] = {1942, 1362, 1312, 1574, 981, 1036};
 
 void init_delay(delay_line_s *dl, double delay_ms, double *input, SF_INFO *sf, double gain)
 {
@@ -42,20 +32,26 @@ void init_delay(delay_line_s *dl, double delay_ms, double *input, SF_INFO *sf, d
     dl->input = input;
     dl->sf = sf;
     dl->ptr = 0;
-    dl->delay_samples = (uint32_t) (sf->samplerate / (delay_ms));
+    dl->delay_samples = (uint64_t) ((double)(sf->samplerate) * (delay_ms/1000));
     dl->delay = calloc(sizeof(double), dl->delay_samples);
     if (NULL == dl->delay){
         printf("FAIL FAIL\n");
     }
     dl->gain = gain;
+    //printf("Gain: %5.4f \t delay_ms: %5.5f \t samples: %d \t samplerat: %d\n", dl->gain, dl->delay_ms, dl->delay_samples, sf->samplerate);
+}
 
+void init_delay_comb(delay_line_s *dl, double delay_ms, double *input, SF_INFO *sf, double gain, double cutoff)
+{
+    init_delay(dl, delay_ms, input, sf, gain);
+    double costh = 2.0 - cos(2.0 * M_PI * cutoff / sf->samplerate);
+    dl->lp_coef = sqrt(costh * costh - 1.0) - costh;
 }
 
 double process_delay(delay_line_s *dl, double x)
 {
     double y = dl->delay[dl->ptr];
     dl->delay[dl->ptr++] = x + (y * dl->gain);
-
     if (dl->ptr >= dl->delay_samples) {
         dl->ptr -= dl->delay_samples;
     }
@@ -75,34 +71,47 @@ double process_allpass(delay_line_s *dl, double x)
 
 double process_comb(delay_line_s *dl, double x)
 {
+
+    /*
+     * prev = in * (1 + coef) - (prev * coef);
+     * return prev;
+    */
+
     double y = dl->delay[dl->ptr];
-    dl->delay[dl->ptr++] = (dl->gain)/(1 + (dl->gain * (x + (y * dl->gain))));
+    double to_lp = y * dl->gain;
+    double from_lp = to_lp * (1+dl->lp_coef) - (dl->lp_last * dl->lp_coef);
+    dl->lp_last = from_lp;
+
+    double OUT = from_lp + x;
+    //dl->delay[dl->ptr++] = (dl->gain)/(1 + (dl->gain * (x + (y * dl->gain))));
+    //dl->delay[dl->ptr++] = (1-dl->gain)/(1 + (dl->gain * y));
+    dl->delay[dl->ptr++] = OUT;
 
     if (dl->ptr >= dl->delay_samples) {
         dl->ptr -= dl->delay_samples;
     }
     return y;
 }
-
+#define TAPS (18)
 void just_delays(double *input, SF_INFO *sf)
 {
-
-    delay_line_s dl[18];
-    for(uint8_t d=0;d<18;d++){
-        init_delay(&dl[d], ER_TAPS[d], input, sf, ER_GAINS[d]);
+    delay_line_s dl[TAPS];
+    for(uint8_t d=0;d<TAPS;d++){
+        init_delay(&dl[d], ER_TAPS[d]*1000, input, sf, ER_GAINS[d]);
     }
 
     uint32_t M = sf->frames*sf->channels;
     for (uint32_t i=0; i<M; i++){
         double x = input[i];
         double processed = 0;
-        for(uint8_t d=0;d<18;d++){
-          processed += process_delay(&dl[d], x);
-        }
+        for(uint8_t d=0;d<TAPS;d++){
+            double y = process_delay(&dl[d], x);
+            processed += y;
 
-      input[i] = processed;
+        }
+        input[i] = processed;
     }
-    for(uint8_t d=0;d<18;d++){
+    for(uint8_t d=0;d<TAPS;d++){
       free(dl[d].delay);
     }
 }
@@ -130,7 +139,8 @@ void comb_filters(double *input, SF_INFO *sf) {
 
   for (uint8_t c = 0; c < 6; c++) {
     double g = pow(10.0, ((-3.0 * comb_delays[c]) / (rt60 * 1000.0)));
-    init_delay(&comb[c], comb_delays[c], input, sf, g);
+    g=0.2;
+    init_delay_comb(&comb[c], comb_delays[c], input, sf, g, comb_damp_freq[c]);
   }
 
   uint32_t M = sf->frames * sf->channels;
@@ -147,33 +157,27 @@ void comb_filters(double *input, SF_INFO *sf) {
   }
 }
 
-void try_moorer(double *samples, SF_INFO *sfinfo)
+void try_moorer(double **samples, SF_INFO *sfinfo)
 {
-  clock_t start_all, end_early, end_memcpy, end_comb, end_allpass, end_use, end_all;
-  start_all = clock();
-  double *early_reflections=calloc(sizeof(double), sfinfo->channels*sfinfo->frames);
-  memccpy(early_reflections, samples, sfinfo->channels*sfinfo->frames, sizeof(double));
-  just_delays(early_reflections, sfinfo);
+    clock_t start_all, end_early, end_memcpy, end_comb, end_allpass, end_use, end_all;
+    start_all = clock();
+    double *early_reflections=calloc(sizeof(double), sfinfo->channels*sfinfo->frames);
+    memcpy(early_reflections, samples, sfinfo->channels*sfinfo->frames * sizeof(double));
+    just_delays(early_reflections, sfinfo);
 
-  double *late_reflections=calloc(sizeof(double), sfinfo->channels*sfinfo->frames);
-  memccpy(late_reflections, early_reflections, sfinfo->channels*sfinfo->frames, sizeof(double));
-  comb_filters(late_reflections, sfinfo);
-  allpass(late_reflections, sfinfo);
-  double dry=0.3;
-  double wet=1-dry;
+    double *late_reflections=calloc(sizeof(double), sfinfo->channels*sfinfo->frames);
+    memcpy(late_reflections, early_reflections, sfinfo->channels*sfinfo->frames * sizeof(double));
+    comb_filters(late_reflections, sfinfo);
+    allpass(late_reflections, sfinfo);
 
-  for(uint32_t i=0; i<sfinfo->channels*sfinfo->frames;i++){
-    samples[i] = samples[i] * dry + late_reflections[i]*wet;
-  }
-  free(early_reflections);
-  free(late_reflections);
-  end_all = clock();
-  double cpu_time_used = ((double) (end_all - start_all)) / CLOCKS_PER_SEC;
-  double audio_length = (double)sfinfo->frames/(double)sfinfo->samplerate;
-  printf("CPU-time used: %5.2f Audio length: %5.2f \n", cpu_time_used, audio_length);
-  if(audio_length>cpu_time_used)
-    printf("Should work realtime\n");
-  else
-    printf("We're too slow\n");
+    double dry=0.7;
+    double wet=1-dry;
+    for(uint32_t i=0; i<sfinfo->channels*sfinfo->frames;i++){
+        *(samples)[i] = *(samples)[i] * dry + late_reflections[i]*wet;
+    }
+
+    free(early_reflections);
+    free(late_reflections);
+
 
 }
