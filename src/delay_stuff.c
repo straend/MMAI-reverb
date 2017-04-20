@@ -110,50 +110,19 @@ void just_delays(double *input, SF_INFO *sf)
 void allpass(double *input, SF_INFO *sf){
 	delay_line_s dla;
 	init_delay(&dla, 6, input, sf, 0.707);
-	
+
 	uint32_t M = sf->frames*sf->channels;
     for (uint32_t i=0; i<M; i++){
 		double x = input[i];
         double processed = 0;
         processed += process_allpass(&dla, x);
-<<<<<<< HEAD
-        
-=======
->>>>>>> 6d8e99049bf017794328e627adc00ef87531179a
         input[i] = processed;
     }
 	free(dla.delay);
-	
+
 }
 
-<<<<<<< HEAD
-void comb_filters(double *input, SF_INFO *sf){
-	delay_line_s dlcb;
-	delay_line_s dlc1;
-	delay_line_s dlc2;
-	delay_line_s dlc3;
-	delay_line_s dlc4;
-	delay_line_s dlc5;
-	init_delay(&dlcb, 50, input, sf, 0.841);
-	init_delay(&dlc1, 56, input, sf, 0.379);
-	init_delay(&dlc2, 61, input, sf, 0.289);
-	init_delay(&dlc3, 68, input, sf, 0.1);
-	init_delay(&dlc4, 72, input, sf, 0.22);
-	init_delay(&dlc5, 78, input, sf, 0.66);
-	
-	uint32_t M = sf->frames*sf->channels;
-    for (uint32_t i=0; i<M; i++){
-		double x = input[i];
-        double processed = 0;
-        processed += process_comb(&dlcb, x);
-        processed += process_comb(&dlc1, x);
-        processed += process_comb(&dlc2, x);
-        processed += process_comb(&dlc3, x);
-        processed += process_comb(&dlc4, x);
-        processed += process_comb(&dlc5, x);
-		
-		input[i] = processed;
-=======
+
 void comb_filters(double *input, SF_INFO *sf) {
   float rt60 = 3.0;
 
@@ -170,7 +139,6 @@ void comb_filters(double *input, SF_INFO *sf) {
     double processed = 0;
     for (uint8_t c = 0; c < 6; c++) {
       processed += process_comb(&comb[c], x);
->>>>>>> 6d8e99049bf017794328e627adc00ef87531179a
     }
     input[i] = processed;
   }

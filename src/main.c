@@ -61,7 +61,7 @@ static void streamFinished( void* userData )
 }
 
 int main (int argc, char *argv[])
-{ 
+{
   char    *infilename=NULL, *outfilename=NULL;
   SNDFILE   *outfile  = NULL;
   SNDFILE   *infile   = NULL ;
@@ -108,7 +108,7 @@ int main (int argc, char *argv[])
 
   memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
-  if ((infile = sf_open (infilename, SFM_READ, &sfinfo)) == NULL) { 
+  if ((infile = sf_open (infilename, SFM_READ, &sfinfo)) == NULL) {
     printf("Could not open '%s' for reading: %s\n", infilename, sf_strerror(NULL));
     return 1 ;
   };
@@ -135,10 +135,6 @@ int main (int argc, char *argv[])
 
     printf("Writing output to: %s\n", outfilename);
     sfinfo_out.frames = sfinfo.frames;
-<<<<<<< HEAD
-=======
-
->>>>>>> 6d8e99049bf017794328e627adc00ef87531179a
     sf_writef_double(outfile, samples, sfinfo_out.frames);
     sf_close(outfile);
   }
@@ -186,4 +182,4 @@ int main (int argc, char *argv[])
 
   free(samples);
   return 0 ;
-} 
+}
