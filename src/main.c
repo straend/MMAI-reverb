@@ -68,7 +68,7 @@ static void streamFinished( void* userData )
 
 int main (int argc, char *argv[])
 {
-    char    *infilename=NULL, *outfilename=NULL;   	
+    char    *infilename=NULL, *outfilename=NULL;
     double mix=0, earlyRD=0;/* max mix is 1, max earlyRD is 1, init values of delay are maximum */
     SNDFILE   *outfile  = NULL;
     SNDFILE   *infile   = NULL ;
@@ -98,20 +98,61 @@ int main (int argc, char *argv[])
     deviceInfo = Pa_GetDeviceInfo(outputParameters.device);
     printf( "Device: %s\n", deviceInfo->name );
 
-    if (argc<4){
+    if (argc<2){
         printf("Need infile and optional outfile as parameters\n\t$%s infile [outfile]\n", argv[0]);
         Pa_Terminate();
 
         return 1;
     }
-    // ./ex input_file mix_parameter ouput_file 
-    if(argc==5){
-        // Write to outfile
-        outfilename = argv [4];
+    enum ARG_STATE {
+        ARG_WAIT,
+        ARG_DRY_SIGNAL,
+        ARG_EARLY,
+        ARG_LATE,
+        ARG_OUTFILE,
+        ARG_RT60
+    };
+    enum ARG_STATE c_state=ARG_WAIT;
+    float dry=0.7,early=0.7,rt60=3.0;
+    infilename=argv[1];
+
+    for(uint8_t i=2;i<argc; i++){
+        if(strncmp("--",argv[i], 2)==0){
+            char *c = argv[i];
+            c++;c++;
+            if(strncmp("dry", c, 3)==0){
+                c_state =ARG_DRY_SIGNAL;
+            } else if (strncmp("early", c, 4)==0){
+                c_state = ARG_EARLY;
+            } else if (strncmp("out", c, 3)==0){
+                c_state = ARG_OUTFILE;
+            } else if (strncmp("rt60", c, 4)==0){
+                c_state = ARG_RT60;
+            } else if (strncmp("rt", c, 2)==0){
+                //real_time = true;
+            }
+
+        } else {
+            switch (c_state) {
+                case ARG_DRY_SIGNAL:
+                  dry = atof(argv[i]);
+                  break;
+              case ARG_EARLY:
+                  early = atof(argv[i]);
+                  break;
+              case ARG_RT60:
+                  rt60 = atof(argv[i]);
+                  break;
+              case ARG_OUTFILE:
+                outfilename = argv[i];
+                break;
+            }
+        }
     }
+
     infilename  = argv [1];
-    mix = atof(argv[2]);
-    earlyRD = atof(argv[3]);
+    mix = dry;
+    earlyRD = early;
 
     memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
@@ -128,7 +169,7 @@ int main (int argc, char *argv[])
     data.samples = sfinfo.frames*sfinfo.channels;
     data.channels = sfinfo.channels;
     data.buffer = samples;
-    
+
     try_moorer(samples, &sfinfo, mix, earlyRD);
     //init_moorer(samples, &sfinfo, FRAMES_PER_BUFFER);
 
