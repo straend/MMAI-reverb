@@ -1,0 +1,48 @@
+CLI controls for parameters
+- Dry/Wet: pourcentage -> 100% = Dry + Wet -> Wet= Dry -1
+	but should be in dB and each very between 0 and 100%
+	because one does not depends from the other
+	If we use only one input parameter, it is better to 
+	change the value of a variable named mix. 
+- early reflections -> room size: %
+	-> delay < 50/80ms; 100% cathedral, 0% closet
+	The more the room is big the more: the delay is longer, 
+	decay is longer, a bigger room sound
+	small size means: short delays to a smaller room sound
+	
+-> Predelay: 0 to x milliseconds
+	Time between Direct Signal and start of Reverb portion.
+	The more space -> the greater the Predelay.
+- late reverberation size
+	Reverberance (%): 
+	How long the reverberation continues 
+	for after the original sound being reverbed comes to an end, 
+	and so simulates the "liveliness" of the room acoustics. 
+	For any given reverberance value, the tail will be greater 
+	for larger room sizes.
+
+- Equalizer -> always 100% Wet
+	Usually a Highshelf and/or Lowshelf EQ with variable Frequency.
+	These EQs are only applied to the output of the reverb or 
+	perhaps even just the reverb portion of the Reverb effect. 
+	Some reverbs have Highshelf and Lowshelf EQs for the 
+	Early Reflections as well.
+
+- Damping: %, Increasing the damping produces a more "muted" effect. 
+	The reverberation does not build up as much, 
+	and the high frequencies decay faster than the 
+	low frequencies. 
+	Simulates the absorption of high frequencies in 
+	the reverberation.
+	Usually a Highshelf and/or a Lowshelf EQ with variable Frequency.
+	These EQs are applied continuously to an evolving reverb of a piece 
+	of audio. 
+	Over time, as the reverb fades, so do certain frequencies, 
+	either in the lower or higher frequency range. 
+	The more less-reflective surfaces the sound bounces around from, 
+	the more the reverb is dampened the higher frequencies.
+
+
+http://manual.audacityteam.org/man/reverb.html
+http://wiki.audacityteam.org/wiki/Principles_of_Reverb
+https://valhalladsp.com/2010/11/27/valhallashimmer-the-controls/
