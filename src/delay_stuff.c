@@ -138,14 +138,14 @@ void allpass(double *input, SF_INFO *sf){
 }
 
 
-void comb_filters(double *input, SF_INFO *sf) {
-  float rt60 = 3.0;
+void comb_filters(double *input, SF_INFO *sf, double rt60)
+{
 
   delay_line_s comb[COMBS];
 
   for (uint8_t c = 0; c < COMBS; c++) {
     double g = pow(10.0, ((-3.0 * comb_delays[c]) / (rt60 * 1000.0)));
-    g=0.2;
+    //g=0.2;
     init_delay_comb(&comb[c], comb_delays[c], input, sf, g, comb_damp_freq[c]);
   }
 
@@ -268,7 +268,7 @@ void finnish_moorer()
   free(late_reflections);
 }
 
-void try_moorer(double *samples, SF_INFO *sfinfo, double mixWet/*, double dry, double wet*/, double earlyRD)
+void try_moorer(double *samples, SF_INFO *sfinfo, double mixWet/*, double dry, double wet*/, double earlyRD, double rt60)
 {
 
     double *early_reflections=calloc(sizeof(double), sfinfo->channels*sfinfo->frames);
@@ -277,12 +277,12 @@ void try_moorer(double *samples, SF_INFO *sfinfo, double mixWet/*, double dry, d
 
     double *late_reflections=calloc(sizeof(double), sfinfo->channels*sfinfo->frames);
     memcpy(late_reflections, early_reflections, sfinfo->channels*sfinfo->frames * sizeof(double));
-    comb_filters(late_reflections, sfinfo);
+    comb_filters(late_reflections, sfinfo, rt60);
     allpass(late_reflections, sfinfo);
 
     //proportional mix of dry and wet
     double mixDry=1-mixWet;
-    //other possibility is to make vary both 
+    //other possibility is to make vary both
     //dry and wet between 0 and 1
     // double dry=0.7;
     // double wet=0.6;

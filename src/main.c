@@ -146,6 +146,8 @@ int main (int argc, char *argv[])
               case ARG_OUTFILE:
                 outfilename = argv[i];
                 break;
+            default:
+                break;
             }
         }
     }
@@ -170,7 +172,7 @@ int main (int argc, char *argv[])
     data.channels = sfinfo.channels;
     data.buffer = samples;
 
-    try_moorer(samples, &sfinfo, mix, earlyRD);
+    try_moorer(samples, &sfinfo, mix, earlyRD, rt60);
     //init_moorer(samples, &sfinfo, FRAMES_PER_BUFFER);
 
     // Play audio
