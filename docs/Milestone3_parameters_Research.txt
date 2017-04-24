@@ -20,6 +20,9 @@ CLI controls for parameters
 	and so simulates the "liveliness" of the room acoustics. 
 	For any given reverberance value, the tail will be greater 
 	for larger room sizes.
+- RT60: time required for reflections of a direct sound to decay 
+	60 dB, RT60 = V/6A, V in m3, A: the equivalent absorption area
+        A = soundAbsorptionCoeff[0->1]*Surface area
 
 - Equalizer -> always 100% Wet
 	Usually a Highshelf and/or Lowshelf EQ with variable Frequency.
