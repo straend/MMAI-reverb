@@ -40,11 +40,15 @@ volatile bool keep_playing = false;
     (void) timeInfo;
     (void) statusFlags;
     (void) inputBuffer;
-    process_moorer(framesPerBuffer, data->buffer);
+    //ou init_moorer
+    //process_moorer(framesPerBuffer, data->buffer);
 
     for( i=0; i<framesPerBuffer; i++ ) {
         for(uint8_t c=0;c<data->channels;c++)
-            *out++ = data->buffer[data->c_sample++];
+	    //out init_moorer
+            //*out++ = data->buffer[data->c_sample++];
+	    //out try_moorer
+	    *out++ = samples[data->c_sample++];
         if(data->c_sample >= data->samples) {
             data->c_sample = 0;
             // Stop playing
@@ -65,7 +69,7 @@ static void streamFinished( void* userData )
 int main (int argc, char *argv[])
 {
     char    *infilename=NULL, *outfilename=NULL;   	
-    double mix=0;
+    double mix=0, earlyRD=0;/* max mix is 1, max earlyRD is 1, init values of delay are maximum */
     SNDFILE   *outfile  = NULL;
     SNDFILE   *infile   = NULL ;
     SF_INFO   sfinfo, sfinfo_out;
@@ -94,19 +98,20 @@ int main (int argc, char *argv[])
     deviceInfo = Pa_GetDeviceInfo(outputParameters.device);
     printf( "Device: %s\n", deviceInfo->name );
 
-    if (argc<2){
+    if (argc<4){
         printf("Need infile and optional outfile as parameters\n\t$%s infile [outfile]\n", argv[0]);
         Pa_Terminate();
 
         return 1;
     }
     // ./ex input_file mix_parameter ouput_file 
-    if(argc==4){
+    if(argc==5){
         // Write to outfile
-        outfilename = argv [3];
+        outfilename = argv [4];
     }
     infilename  = argv [1];
     mix = atof(argv[2]);
+    earlyRD = atof(argv[3]);
 
     memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
@@ -124,7 +129,7 @@ int main (int argc, char *argv[])
     data.channels = sfinfo.channels;
     data.buffer = samples;
     
-    try_moorer(samples, &sfinfo, mix);
+    try_moorer(samples, &sfinfo, mix, earlyRD);
     //init_moorer(samples, &sfinfo, FRAMES_PER_BUFFER);
 
     // Play audio

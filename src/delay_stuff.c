@@ -99,11 +99,11 @@ double process_comb(delay_line_s *dl, double x)
     }
     return y;
 }
-void just_delays(double *input, SF_INFO *sf)
+void just_delays(double *input, SF_INFO *sf, double earlyRD)
 {
   delay_line_s dl[TAPS];
   for(uint8_t d=0;d<TAPS;d++){
-    init_delay(&dl[d], ER_TAPS[d], input, sf, ER_GAINS[d]);
+    init_delay(&dl[d], ER_TAPS[d]*earlyRD, input, sf, ER_GAINS[d]);
   }
 
   uint32_t M = sf->frames*sf->channels;
@@ -268,22 +268,29 @@ void finnish_moorer()
   free(late_reflections);
 }
 
-void try_moorer(double *samples, SF_INFO *sfinfo, double mix)
+void try_moorer(double *samples, SF_INFO *sfinfo, double mixWet/*, double dry, double wet*/, double earlyRD)
 {
 
     double *early_reflections=calloc(sizeof(double), sfinfo->channels*sfinfo->frames);
     memcpy(early_reflections, samples, sfinfo->channels*sfinfo->frames * sizeof(double));
-    just_delays(early_reflections, sfinfo);
+    just_delays(early_reflections, sfinfo, earlyRD);
 
     double *late_reflections=calloc(sizeof(double), sfinfo->channels*sfinfo->frames);
     memcpy(late_reflections, early_reflections, sfinfo->channels*sfinfo->frames * sizeof(double));
     comb_filters(late_reflections, sfinfo);
     allpass(late_reflections, sfinfo);
 
-    //double mix=0.3;
-    double dry=1-mix;
+    //proportional mix of dry and wet
+    double mixDry=1-mixWet;
+    //other possibility is to make vary both 
+    //dry and wet between 0 and 1
+    // double dry=0.7;
+    // double wet=0.6;
     for(uint32_t i=0; i<sfinfo->channels*sfinfo->frames;i++){
-        samples[i] = samples[i] * dry + late_reflections[i]*mix;
+        //first possibility
+	samples[i] = samples[i] * mixDry + late_reflections[i]*mixWet;
+	//second possibility
+	//samples[i] = samples[i] * dry + late_reflections[i]*wet;
     }
 
     free(early_reflections);

@@ -31,10 +31,10 @@ void init_delay(delay_line_s *dl, double delay_ms, double *input, SF_INFO *sf, d
 double process_delay(delay_line_s *dl, double x);
 
 
-void just_delays(double *input, SF_INFO *sf);
+void just_delays(double *input, SF_INFO *sf, double earlyRD);
 void allpass(double *input, SF_INFO *sf);
 void comb_filters(double *input, SF_INFO *sf);
-void try_moorer(double *samples, SF_INFO *sfinfo, double mix);
+void try_moorer(double *samples, SF_INFO *sfinfo, double mix, double earlyRD);
 
 void init_moorer(double *samples, SF_INFO *sfinfo, const uint32_t iter);
 void process_moorer(const uint32_t iter, double *samples);
