@@ -64,7 +64,8 @@ static void streamFinished( void* userData )
 
 int main (int argc, char *argv[])
 {
-    char    *infilename=NULL, *outfilename=NULL;
+    char    *infilename=NULL, *outfilename=NULL;   	
+    double mix=0;
     SNDFILE   *outfile  = NULL;
     SNDFILE   *infile   = NULL ;
     SF_INFO   sfinfo, sfinfo_out;
@@ -99,12 +100,13 @@ int main (int argc, char *argv[])
 
         return 1;
     }
-
-    if(argc==3){
+    // ./ex input_file mix_parameter ouput_file 
+    if(argc==4){
         // Write to outfile
-        outfilename = argv [2];
+        outfilename = argv [3];
     }
     infilename  = argv [1];
+    mix = atof(argv[2]);
 
     memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
@@ -122,8 +124,8 @@ int main (int argc, char *argv[])
     data.channels = sfinfo.channels;
     data.buffer = samples;
     
-    //try_moorer(samples, &sfinfo);
-    init_moorer(samples, &sfinfo, FRAMES_PER_BUFFER);
+    try_moorer(samples, &sfinfo, mix);
+    //init_moorer(samples, &sfinfo, FRAMES_PER_BUFFER);
 
     // Play audio
     outputParameters.channelCount = sfinfo.channels;

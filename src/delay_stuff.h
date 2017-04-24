@@ -34,7 +34,7 @@ double process_delay(delay_line_s *dl, double x);
 void just_delays(double *input, SF_INFO *sf);
 void allpass(double *input, SF_INFO *sf);
 void comb_filters(double *input, SF_INFO *sf);
-void try_moorer(double *samples, SF_INFO *sfinfo);
+void try_moorer(double *samples, SF_INFO *sfinfo, double mix);
 
 void init_moorer(double *samples, SF_INFO *sfinfo, const uint32_t iter);
 void process_moorer(const uint32_t iter, double *samples);

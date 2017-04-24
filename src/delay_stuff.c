@@ -268,7 +268,7 @@ void finnish_moorer()
   free(late_reflections);
 }
 
-void try_moorer(double *samples, SF_INFO *sfinfo)
+void try_moorer(double *samples, SF_INFO *sfinfo, double mix)
 {
 
     double *early_reflections=calloc(sizeof(double), sfinfo->channels*sfinfo->frames);
@@ -280,10 +280,10 @@ void try_moorer(double *samples, SF_INFO *sfinfo)
     comb_filters(late_reflections, sfinfo);
     allpass(late_reflections, sfinfo);
 
-    double dry=0.3;
-    double wet=1-dry;
+    //double mix=0.3;
+    double dry=1-mix;
     for(uint32_t i=0; i<sfinfo->channels*sfinfo->frames;i++){
-        samples[i] = samples[i] * dry + late_reflections[i]*wet;
+        samples[i] = samples[i] * dry + late_reflections[i]*mix;
     }
 
     free(early_reflections);
