@@ -65,7 +65,33 @@ static void streamFinished( void* userData )
     printf( "Stream Completed\n");
     keep_playing = false;
 }
-
+void print_usage(char *cmd_name)
+{
+    const char *help="\
+     __  __ __  __   _   ___   ___ _____   _____ ___ ___     \n\
+    |  \\/  |  \\/  | /_\\ |_ _| | _ \\ __\\ \\ / / __| _ \\ _ )    \n\
+    | |\\/| | |\\/| |/ _ \\ | |  |   / _| \\ V /| _||   / _ \\    \n\
+    |_|  |_|_|  |_/_/ \\_\\___| |_|_\\___| \\_/ |___|_|_\\___/    \n\
+   ┌───────────────────────────────────────────────────────┐ \n\
+   │Required parameter: audio-file to play, first argument │ \n\
+   │                                                       │ \n\
+   │Optional parameters:                                   │ \n\
+   │--dry       [0.0-1.0]                                  │ \n\
+   │                                                       │ \n\
+   │--early     [0.0-1.0]                                  │ \n\
+   │                                                       │ \n\
+   │--rt60      [0.0-10.0]                                 │ \n\
+   │                                                       │ \n\
+   │--out       filename to write Reverbed audio to        │ \n\
+   │                                                       │ \n\
+   │Example:                                               │ \n\
+   │%s ../audio/saxGandalf.wav --dry 0.6 --rt60 5.3    │ \n\
+   │                                                       │ \n\
+   │                                                       │ \n\
+   └───────────────────────────────────────────────────────┘ \n\
+    \n\n";
+    printf(help, cmd_name);
+}
 int main (int argc, char *argv[])
 {
     char    *infilename=NULL, *outfilename=NULL;
@@ -93,17 +119,16 @@ int main (int argc, char *argv[])
         Pa_Terminate();
         return 1;
     }
-
     const PaDeviceInfo *deviceInfo;
     deviceInfo = Pa_GetDeviceInfo(outputParameters.device);
-    printf( "Device: %s\n", deviceInfo->name );
 
     if (argc<2){
-        printf("Need infile and optional outfile as parameters\n\t$%s infile [outfile]\n", argv[0]);
+        print_usage(argv[0]);
         Pa_Terminate();
-
         return 1;
     }
+    printf( "Device: %s\n", deviceInfo->name );
+
     enum ARG_STATE {
         ARG_WAIT,
         ARG_DRY_SIGNAL,
