@@ -287,10 +287,9 @@ void try_moorer(double *samples, SF_INFO *sfinfo, double mixWet/*, double dry, d
     // double dry=0.7;
     // double wet=0.6;
     for(uint32_t i=0; i<sfinfo->channels*sfinfo->frames;i++){
-        //first possibility
-	samples[i] = samples[i] * mixDry + late_reflections[i]*mixWet;
-	//second possibility
-	//samples[i] = samples[i] * dry + late_reflections[i]*wet;
+      samples[i] = samples[i] * mixDry + late_reflections[i]*mixWet;
+      //second possibility
+      //samples[i] = samples[i] * dry + late_reflections[i]*wet;
     }
 
     free(early_reflections);

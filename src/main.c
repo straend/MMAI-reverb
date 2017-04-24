@@ -75,12 +75,12 @@ void print_usage(char *cmd_name)
    ┌───────────────────────────────────────────────────────┐ \n\
    │Required parameter: audio-file to play, first argument │ \n\
    │                                                       │ \n\
-   │Optional parameters:                                   │ \n\
-   │--dry       [0.0-1.0]                                  │ \n\
+   │Optional parameters:     Default                       │ \n\
+   │--dry       [0.0-1.0]    0.7                           │ \n\
    │                                                       │ \n\
-   │--early     [0.0-1.0]                                  │ \n\
+   │--size      [0.0-1.0]    0.7                           │ \n\
    │                                                       │ \n\
-   │--rt60      [0.0-10.0]                                 │ \n\
+   │--rt60      [0.0-10.0]   3.0                           │ \n\
    │                                                       │ \n\
    │--out       filename to write Reverbed audio to        │ \n\
    │                                                       │ \n\
@@ -176,7 +176,6 @@ int main (int argc, char *argv[])
         }
     }
 
-    infilename  = argv [1];
     mix = dry;
     earlyRD = size;
     lateRD = size;
