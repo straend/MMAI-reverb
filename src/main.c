@@ -69,7 +69,7 @@ static void streamFinished( void* userData )
 int main (int argc, char *argv[])
 {
     char    *infilename=NULL, *outfilename=NULL;
-    double mix=0, earlyRD=0;/* max mix is 1, max earlyRD is 1, init values of delay are maximum */
+    double mix=0, earlyRD=0, lateRD=0;/* max mix is 1, max earlyRD is 1, init values of delay are maximum */
     SNDFILE   *outfile  = NULL;
     SNDFILE   *infile   = NULL ;
     SF_INFO   sfinfo, sfinfo_out;
@@ -107,13 +107,12 @@ int main (int argc, char *argv[])
     enum ARG_STATE {
         ARG_WAIT,
         ARG_DRY_SIGNAL,
-        ARG_EARLY,
-        ARG_LATE,
+        ARG_SIZE,
         ARG_OUTFILE,
         ARG_RT60
     };
     enum ARG_STATE c_state=ARG_WAIT;
-    float dry=0.7,early=0.7,rt60=3.0;
+    float dry=0.7,size=0.7,rt60=3.0;
     infilename=argv[1];
 
     for(uint8_t i=2;i<argc; i++){
@@ -122,8 +121,8 @@ int main (int argc, char *argv[])
             c++;c++;
             if(strncmp("dry", c, 3)==0){
                 c_state =ARG_DRY_SIGNAL;
-            } else if (strncmp("early", c, 4)==0){
-                c_state = ARG_EARLY;
+            } else if (strncmp("size", c, 4)==0){
+                c_state = ARG_SIZE;
             } else if (strncmp("out", c, 3)==0){
                 c_state = ARG_OUTFILE;
             } else if (strncmp("rt60", c, 4)==0){
@@ -137,8 +136,8 @@ int main (int argc, char *argv[])
                 case ARG_DRY_SIGNAL:
                   dry = atof(argv[i]);
                   break;
-              case ARG_EARLY:
-                  early = atof(argv[i]);
+              case ARG_SIZE:
+                  size = atof(argv[i]);
                   break;
               case ARG_RT60:
                   rt60 = atof(argv[i]);
@@ -154,7 +153,8 @@ int main (int argc, char *argv[])
 
     infilename  = argv [1];
     mix = dry;
-    earlyRD = early;
+    earlyRD = size;
+    lateRD = size;
 
     memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
@@ -172,7 +172,7 @@ int main (int argc, char *argv[])
     data.channels = sfinfo.channels;
     data.buffer = samples;
 
-    try_moorer(samples, &sfinfo, mix, earlyRD, rt60);
+    try_moorer(samples, &sfinfo, mix, earlyRD, lateRD, rt60);
     //init_moorer(samples, &sfinfo, FRAMES_PER_BUFFER);
 
     // Play audio
