@@ -140,29 +140,41 @@ int main (int argc, char *argv[])
         ARG_OUTFILE,
         ARG_AREA,
         ARG_VOLUME,
+        ARG_RT60,
         ARG_DAMPING /* The dampening will make the "wet" sound of reverb less apparent */
         /* High cut: Emulates the effect of high frequencies being absorbed */
     };
     enum ARG_STATE c_state=ARG_WAIT;
-    float wet=0.7,reflect=0.7,damping=0.3,area=20, volume=40;
+    float wet=0.7,reflect=0.7,damping=0.3,area=20, volume=40, rt60=3.5;
     infilename=argv[1];
 
+    bool has_rt60 = false;
+    bool has_volume_or_area = false;
     for(uint8_t i=2;i<argc; i++){
         if(strncmp("--",argv[i], 2)==0){
             char *c = argv[i];
             c++;c++;
             if(strncmp("wet", c, 3)==0){
                 c_state =ARG_WET_SIGNAL;
+
             } else if (strncmp("reflect", c, 7)==0){
                 c_state = ARG_SIZE;
+
+            } else if (strncmp("rt60", c, 4)==0){
+                c_state = ARG_RT60;
+
             } else if (strncmp("out", c, 3)==0){
                 c_state = ARG_OUTFILE;
+
             } else if (strncmp("area", c, 4)==0){
                 c_state = ARG_AREA;
+
             }  else if (strncmp("volume", c, 6)==0){
                 c_state = ARG_VOLUME;
+
             } else if (strncmp("rt", c, 2)==0){
                 //real_time = true;
+
             } else if (strncmp("damping", c, 7)==0){
                 c_state = ARG_DAMPING;
             }
@@ -177,13 +189,20 @@ int main (int argc, char *argv[])
                   break;
               case ARG_AREA:
                   area = atof(argv[i]);
+                  has_volume_or_area = true;
                   break;
               case ARG_VOLUME:
                   volume = atof(argv[i]);
+                  has_volume_or_area = true;
                   break;
               case ARG_DAMPING:
-                  damping = atof(argv[i]);
+                  damping = 1/atof(argv[i]);
                   break;
+              case ARG_RT60:
+                  rt60 = atof(argv[i]);
+                  has_rt60 = true;
+                  break;
+
               case ARG_OUTFILE:
                 outfilename = argv[i];
                 break;
@@ -193,6 +212,21 @@ int main (int argc, char *argv[])
         }
     }
 
+    if(reflect==0.0)
+      reflect = 0.01;
+
+    if(!has_rt60 && has_volume_or_area){
+      /*
+       * RT = 0.16 x V / A
+       * T = reverberation time, s
+       * V = volume of the room, m3
+       * A = (Σ surface area (S) x α) = absorption area of the room, m2
+       * For a frequency of 100Hz and 4mm glass as materia matCoef = 0.07
+       */
+        double matCoef = 0.07;
+        double A = area*matCoef;
+        rt60 = 0.16*volume/A;
+    }
 
     earlyRD = reflect;
     lateRD = reflect;
