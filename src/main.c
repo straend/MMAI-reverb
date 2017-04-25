@@ -76,7 +76,7 @@ void print_usage(char *cmd_name)
    │Required parameter: audio-file to play, first argument │ \n\
    │                                                       │ \n\
    │Optional parameters:     Default                       │ \n\
-   │--dry       [0.0-1.0]    0.7                           │ \n\
+   │--wet       [0.0-1.0]    0.7                           │ \n\
    │                                                       │ \n\
    │--reflect   [0.0-1.0]    0.7                           │ \n\
    |                                                       | \n\
@@ -89,7 +89,7 @@ void print_usage(char *cmd_name)
    │--out       filename to write Reverbed audio to        │ \n\
    │                                                       │ \n\
    │Example:                                               │ \n\
-   │%s ../audio/saxGandalf.wav --dry 0.6 --rt60 5.3    	   │ \n\
+   │%s ../audio/saxGandalf.wav --dry 0.6 --rt60 5.3    │ \n\
    │                                                       │ \n\
    │                                                       │ \n\
    └───────────────────────────────────────────────────────┘ \n\
@@ -135,7 +135,7 @@ int main (int argc, char *argv[])
 
     enum ARG_STATE {
         ARG_WAIT,
-        ARG_DRY_SIGNAL,
+        ARG_WET_SIGNAL,
         ARG_SIZE,
         ARG_OUTFILE,
         ARG_AREA,
@@ -144,15 +144,15 @@ int main (int argc, char *argv[])
         /* High cut: Emulates the effect of high frequencies being absorbed */
     };
     enum ARG_STATE c_state=ARG_WAIT;
-    float dry=0.7,reflect=0.7,damping=0.3,area=20, volume=40;
+    float wet=0.7,reflect=0.7,damping=0.3,area=20, volume=40;
     infilename=argv[1];
 
     for(uint8_t i=2;i<argc; i++){
         if(strncmp("--",argv[i], 2)==0){
             char *c = argv[i];
             c++;c++;
-            if(strncmp("dry", c, 3)==0){
-                c_state =ARG_DRY_SIGNAL;
+            if(strncmp("wet", c, 3)==0){
+                c_state =ARG_WET_SIGNAL;
             } else if (strncmp("reflect", c, 7)==0){
                 c_state = ARG_SIZE;
             } else if (strncmp("out", c, 3)==0){
@@ -169,8 +169,8 @@ int main (int argc, char *argv[])
 
         } else {
             switch (c_state) {
-                case ARG_DRY_SIGNAL:
-                  dry = atof(argv[i]);
+                case ARG_WET_SIGNAL:
+                  wet = atof(argv[i]);
                   break;
               case ARG_SIZE:
                   reflect = atof(argv[i]);
@@ -193,7 +193,7 @@ int main (int argc, char *argv[])
         }
     }
 
-    mix = dry;
+
     earlyRD = reflect;
     lateRD = reflect;
 
@@ -213,7 +213,7 @@ int main (int argc, char *argv[])
     data.channels = sfinfo.channels;
     data.buffer = samples;
 
-    try_moorer(samples, &sfinfo, mix, earlyRD, lateRD, area, volume, damping);
+    try_moorer(samples, &sfinfo, wet, earlyRD, lateRD, area, volume, damping);
     //init_moorer(samples, &sfinfo, FRAMES_PER_BUFFER, damping);
 
     // Play audio
