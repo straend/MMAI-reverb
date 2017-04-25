@@ -76,11 +76,14 @@ void print_usage(char *cmd_name)
    │Required parameter: audio-file to play, first argument │ \n\
    │                                                       │ \n\
    │Optional parameters:     Default                       │ \n\
+   |                                                       | \n\
    │--wet       [0.0-1.0]    0.7                           │ \n\
-   │                                                       │ \n\
+   |                                                       | \n\
+   │--rt60      seconds      3.5s                          │ \n\
+   |                                                       | \n\
    │--reflect   [0.0-1.0]    0.7                           │ \n\
    |                                                       | \n\
-   |--damping   [0.0-1.0]    0.3                           | \n\
+   |--damping   [0.0-1.0]    1                             | \n\
    │                                                       │ \n\
    │--area      [0.0-100.0]   20                           │ \n\
    |                                                       | \n\
@@ -145,7 +148,7 @@ int main (int argc, char *argv[])
         /* High cut: Emulates the effect of high frequencies being absorbed */
     };
     enum ARG_STATE c_state=ARG_WAIT;
-    float wet=0.7,reflect=0.7,damping=0.3,area=20, volume=40, rt60=3.5;
+    float wet=0.7,reflect=0.7,damping=1.0,area=20, volume=40, rt60=3.5;
     infilename=argv[1];
 
     bool has_rt60 = false;
@@ -227,7 +230,6 @@ int main (int argc, char *argv[])
         double A = area*matCoef;
         rt60 = 0.16*volume/A;
     }
-
     earlyRD = reflect;
     lateRD = reflect;
 
@@ -247,7 +249,7 @@ int main (int argc, char *argv[])
     data.channels = sfinfo.channels;
     data.buffer = samples;
 
-    try_moorer(samples, &sfinfo, wet, earlyRD, lateRD, area, volume, damping);
+    try_moorer(samples, &sfinfo, wet, earlyRD, lateRD, rt60, damping);
     //init_moorer(samples, &sfinfo, FRAMES_PER_BUFFER, damping);
 
     // Play audio

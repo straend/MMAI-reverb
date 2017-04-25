@@ -143,21 +143,8 @@ void allpass(double *input, SF_INFO *sf, double lateRD){
 }
 
 
-void comb_filters(double *input, SF_INFO *sf, double area, 
-				double volume, double damping
-)
+void comb_filters(double *input, SF_INFO *sf, double rt60, double damping)
 {
-/*
- * RT = 0.16 x V / A
- * T = reverberation time, s
- * V = volume of the room, m3
- * A = (Σ surface area (S) x α) = absorption area of the room, m2
- * For a frequency of 100Hz and 4mm glass as materia matCoef = 0.07
- */
-  double matCoef = 0.07;
-  double A = area*matCoef;
-  double rt60 = 0.16*volume/A;
-  
   delay_line_s comb[COMBS];
 
   for (uint8_t c = 0; c < COMBS; c++) {
@@ -287,10 +274,17 @@ void finnish_moorer()
   free(late_reflections);
 }
 
-void try_moorer(double *samples, SF_INFO *sfinfo, 
-				double mixWet/*, double dry, double wet*/, 
-				double earlyRD, double lateRD, double area, 
-				double volume, double damping
+void print_stuff(double *one, double *two, uint32_t start, uint32_t samples)
+{
+  for(uint32_t i=start; i<start+samples; i++){
+    printf("%f \t %f \n", one[i], two[i]);
+  }
+  printf("##############\n");
+}
+
+void try_moorer(double *samples, SF_INFO *sfinfo,
+				double mixWet/*, double dry, double wet*/,
+				double earlyRD, double lateRD, double rt60, double damping
 )
 {
 
@@ -300,7 +294,7 @@ void try_moorer(double *samples, SF_INFO *sfinfo,
 
     double *late_reflections=calloc(sizeof(double), sfinfo->channels*sfinfo->frames);
     memcpy(late_reflections, early_reflections, sfinfo->channels*sfinfo->frames * sizeof(double));
-    comb_filters(late_reflections, sfinfo, area, volume, damping);
+    comb_filters(late_reflections, sfinfo, rt60, damping);
     allpass(late_reflections, sfinfo, lateRD);
 
     //proportional mix of dry and wet
