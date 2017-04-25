@@ -27,16 +27,25 @@ typedef struct{
     double lp_last;
 
 } delay_line_s;
-void init_delay(delay_line_s *dl, double delay_ms, double *input, SF_INFO *sf, double gain);
+void init_delay(delay_line_s *dl, double delay_ms, 
+				double *input, SF_INFO *sf, double gain
+);
 double process_delay(delay_line_s *dl, double x);
 
 
 void just_delays(double *input, SF_INFO *sf, double earlyRD);
 void allpass(double *input, SF_INFO *sf, double lateRD);
-void comb_filters(double *input, SF_INFO *sf, double rt60);
-void try_moorer(double *samples, SF_INFO *sfinfo, double mix, double earlyRD, double lateRD, double rt60);
+void comb_filters(double *input, SF_INFO *sf, double rt60, 
+				double damping
+);
+void try_moorer(double *samples, SF_INFO *sfinfo, double mix, 
+				double earlyRD, double lateRD, double rt60, 
+				double damping
+);
 
-void init_moorer(double *samples, SF_INFO *sfinfo, const uint32_t iter);
+void init_moorer(double *samples, SF_INFO *sfinfo, const uint32_t iter, 
+				double damping
+);
 void process_moorer(const uint32_t iter, double *samples);
 void finnish_moorer();
 

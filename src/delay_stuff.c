@@ -30,7 +30,9 @@ const double ER_GAINS[] = {
 const double comb_delays[] = {50, 56, 61, 68, 72, 78};
 const double comb_damp_freq[] = {1942, 1362, 1312, 1574, 981, 1036};
 
-void init_delay(delay_line_s *dl, double delay_ms, double *input, SF_INFO *sf, double gain)
+void init_delay(delay_line_s *dl, double delay_ms, 
+				double *input, SF_INFO *sf, double gain
+)
 {
     dl->delay_ms = delay_ms;
     dl->input = input;
@@ -45,7 +47,10 @@ void init_delay(delay_line_s *dl, double delay_ms, double *input, SF_INFO *sf, d
     //printf("Gain: %5.4f \t delay_ms: %5.5f \t samples: %d \t samplerat: %d\n", dl->gain, dl->delay_ms, dl->delay_samples, sf->samplerate);
 }
 
-void init_delay_comb(delay_line_s *dl, double delay_ms, double *input, SF_INFO *sf, double gain, double cutoff)
+void init_delay_comb(delay_line_s *dl, double delay_ms, 
+					double *input, SF_INFO *sf, double gain, 
+					double cutoff
+)
 {
     init_delay(dl, delay_ms, input, sf, gain);
     double costh = 2.0 - cos(2.0 * M_PI * cutoff / sf->samplerate);
@@ -138,7 +143,7 @@ void allpass(double *input, SF_INFO *sf, double lateRD){
 }
 
 
-void comb_filters(double *input, SF_INFO *sf, double rt60)
+void comb_filters(double *input, SF_INFO *sf, double rt60, double damping)
 {
 
   delay_line_s comb[COMBS];
@@ -146,7 +151,7 @@ void comb_filters(double *input, SF_INFO *sf, double rt60)
   for (uint8_t c = 0; c < COMBS; c++) {
     double g = pow(10.0, ((-3.0 * comb_delays[c]) / (rt60 * 1000.0)));
     //g=0.2;
-    init_delay_comb(&comb[c], comb_delays[c], input, sf, g, comb_damp_freq[c]);
+    init_delay_comb(&comb[c], comb_delays[c], input, sf, g, comb_damp_freq[c]*damping);
   }
 
   uint32_t M = sf->frames * sf->channels;
@@ -173,14 +178,14 @@ void init_early(double *samples, SF_INFO *sfinfo)
   }
 }
 
-void init_combs(double *samples, SF_INFO *sfinfo)
+void init_combs(double *samples, SF_INFO *sfinfo, double damping)
 {
   float rt60 = 3.0;
 
   for (uint8_t c = 0; c < COMBS; c++) {
     double g = pow(10.0, ((-3.0 * comb_delays[c]) / (rt60 * 1000.0)));
     g=0.2;
-    init_delay_comb(&comb[c], comb_delays[c], samples, sfinfo, g, comb_damp_freq[c]);
+    init_delay_comb(&comb[c], comb_delays[c], samples, sfinfo, g, comb_damp_freq[c]*damping);
   }
 }
 
@@ -227,10 +232,12 @@ double *early_reflections;
 double *late_reflections;
 uint32_t cur_iter=0;
 
-void init_moorer(double *samples, SF_INFO *sfinfo, const uint32_t iter)
+void init_moorer(double *samples, SF_INFO *sfinfo, const uint32_t iter, 
+				double damping
+)
 {
   init_early(samples, sfinfo);
-  init_combs(samples, sfinfo);
+  init_combs(samples, sfinfo, damping);
   init_allpass(samples, sfinfo);
   early_reflections=calloc(sizeof(double), iter);
   late_reflections=calloc(sizeof(double), iter);
@@ -268,7 +275,11 @@ void finnish_moorer()
   free(late_reflections);
 }
 
-void try_moorer(double *samples, SF_INFO *sfinfo, double mixWet/*, double dry, double wet*/, double earlyRD, double lateRD, double rt60)
+void try_moorer(double *samples, SF_INFO *sfinfo, 
+				double mixWet/*, double dry, double wet*/, 
+				double earlyRD, double lateRD, double rt60, 
+				double damping
+)
 {
 
     double *early_reflections=calloc(sizeof(double), sfinfo->channels*sfinfo->frames);
@@ -277,7 +288,7 @@ void try_moorer(double *samples, SF_INFO *sfinfo, double mixWet/*, double dry, d
 
     double *late_reflections=calloc(sizeof(double), sfinfo->channels*sfinfo->frames);
     memcpy(late_reflections, early_reflections, sfinfo->channels*sfinfo->frames * sizeof(double));
-    comb_filters(late_reflections, sfinfo, rt60);
+    comb_filters(late_reflections, sfinfo, rt60, damping);
     allpass(late_reflections, sfinfo, lateRD);
 
     //proportional mix of dry and wet

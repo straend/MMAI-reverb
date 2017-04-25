@@ -79,13 +79,15 @@ void print_usage(char *cmd_name)
    │--dry       [0.0-1.0]    0.7                           │ \n\
    │                                                       │ \n\
    │--size      [0.0-1.0]    0.7                           │ \n\
+   |                                                       | \n\
+   |--damping   [0.0-1.0]    0.3                           | \n\
    │                                                       │ \n\
    │--rt60      [0.0-10.0]   3.0                           │ \n\
    │                                                       │ \n\
    │--out       filename to write Reverbed audio to        │ \n\
    │                                                       │ \n\
    │Example:                                               │ \n\
-   │%s ../audio/saxGandalf.wav --dry 0.6 --rt60 5.3    │ \n\
+   │%s ../audio/saxGandalf.wav --dry 0.6 --rt60 5.3    	   │ \n\
    │                                                       │ \n\
    │                                                       │ \n\
    └───────────────────────────────────────────────────────┘ \n\
@@ -134,10 +136,12 @@ int main (int argc, char *argv[])
         ARG_DRY_SIGNAL,
         ARG_SIZE,
         ARG_OUTFILE,
-        ARG_RT60
+        ARG_RT60,
+        ARG_DAMPING /* The dampening will make the "wet" sound of reverb less apparent */
+        /* High cut: Emulates the effect of high frequencies being absorbed */
     };
     enum ARG_STATE c_state=ARG_WAIT;
-    float dry=0.7,size=0.7,rt60=3.0;
+    float dry=0.7,size=0.7,damping=0.3,rt60=3.0;
     infilename=argv[1];
 
     for(uint8_t i=2;i<argc; i++){
@@ -154,6 +158,8 @@ int main (int argc, char *argv[])
                 c_state = ARG_RT60;
             } else if (strncmp("rt", c, 2)==0){
                 //real_time = true;
+            } else if (strncmp("damping", c, 7)==0){
+                c_state = ARG_DAMPING;
             }
 
         } else {
@@ -166,6 +172,9 @@ int main (int argc, char *argv[])
                   break;
               case ARG_RT60:
                   rt60 = atof(argv[i]);
+                  break;
+              case ARG_DAMPING:
+                  damping = atof(argv[i]);
                   break;
               case ARG_OUTFILE:
                 outfilename = argv[i];
@@ -196,8 +205,8 @@ int main (int argc, char *argv[])
     data.channels = sfinfo.channels;
     data.buffer = samples;
 
-    try_moorer(samples, &sfinfo, mix, earlyRD, lateRD, rt60);
-    //init_moorer(samples, &sfinfo, FRAMES_PER_BUFFER);
+    try_moorer(samples, &sfinfo, mix, earlyRD, lateRD, rt60, damping);
+    //init_moorer(samples, &sfinfo, FRAMES_PER_BUFFER, damping);
 
     // Play audio
     outputParameters.channelCount = sfinfo.channels;
