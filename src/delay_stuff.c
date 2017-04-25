@@ -120,7 +120,7 @@ void just_delays(double *input, SF_INFO *sf, double earlyRD)
             processed += y;
 
         }
-        input[i] = processed;
+        input[i] = processed/TAPS;
     }
     for(uint8_t d=0;d<TAPS;d++){
       free(dl[d].delay);
