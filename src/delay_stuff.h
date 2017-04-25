@@ -35,12 +35,12 @@ double process_delay(delay_line_s *dl, double x);
 
 void just_delays(double *input, SF_INFO *sf, double earlyRD);
 void allpass(double *input, SF_INFO *sf, double lateRD);
-void comb_filters(double *input, SF_INFO *sf, double rt60, 
-				double damping
+void comb_filters(double *input, SF_INFO *sf, double area, 
+				double volume, double damping
 );
 void try_moorer(double *samples, SF_INFO *sfinfo, double mix, 
-				double earlyRD, double lateRD, double rt60, 
-				double damping
+				double earlyRD, double lateRD, double area, 
+				double volume, double damping
 );
 
 void init_moorer(double *samples, SF_INFO *sfinfo, const uint32_t iter, 

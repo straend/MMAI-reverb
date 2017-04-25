@@ -78,11 +78,13 @@ void print_usage(char *cmd_name)
    │Optional parameters:     Default                       │ \n\
    │--dry       [0.0-1.0]    0.7                           │ \n\
    │                                                       │ \n\
-   │--size      [0.0-1.0]    0.7                           │ \n\
+   │--reflect   [0.0-1.0]    0.7                           │ \n\
    |                                                       | \n\
    |--damping   [0.0-1.0]    0.3                           | \n\
    │                                                       │ \n\
-   │--rt60      [0.0-10.0]   3.0                           │ \n\
+   │--area      [0.0-100.0]   20                           │ \n\
+   |                                                       | \n\
+   |--volume    [0.0-200.0]   40                           | \n\
    │                                                       │ \n\
    │--out       filename to write Reverbed audio to        │ \n\
    │                                                       │ \n\
@@ -136,12 +138,13 @@ int main (int argc, char *argv[])
         ARG_DRY_SIGNAL,
         ARG_SIZE,
         ARG_OUTFILE,
-        ARG_RT60,
+        ARG_AREA,
+        ARG_VOLUME,
         ARG_DAMPING /* The dampening will make the "wet" sound of reverb less apparent */
         /* High cut: Emulates the effect of high frequencies being absorbed */
     };
     enum ARG_STATE c_state=ARG_WAIT;
-    float dry=0.7,size=0.7,damping=0.3,rt60=3.0;
+    float dry=0.7,reflect=0.7,damping=0.3,area=20, volume=40;
     infilename=argv[1];
 
     for(uint8_t i=2;i<argc; i++){
@@ -150,12 +153,14 @@ int main (int argc, char *argv[])
             c++;c++;
             if(strncmp("dry", c, 3)==0){
                 c_state =ARG_DRY_SIGNAL;
-            } else if (strncmp("size", c, 4)==0){
+            } else if (strncmp("reflect", c, 7)==0){
                 c_state = ARG_SIZE;
             } else if (strncmp("out", c, 3)==0){
                 c_state = ARG_OUTFILE;
-            } else if (strncmp("rt60", c, 4)==0){
-                c_state = ARG_RT60;
+            } else if (strncmp("area", c, 4)==0){
+                c_state = ARG_AREA;
+            }  else if (strncmp("volume", c, 6)==0){
+                c_state = ARG_VOLUME;
             } else if (strncmp("rt", c, 2)==0){
                 //real_time = true;
             } else if (strncmp("damping", c, 7)==0){
@@ -168,10 +173,13 @@ int main (int argc, char *argv[])
                   dry = atof(argv[i]);
                   break;
               case ARG_SIZE:
-                  size = atof(argv[i]);
+                  reflect = atof(argv[i]);
                   break;
-              case ARG_RT60:
-                  rt60 = atof(argv[i]);
+              case ARG_AREA:
+                  area = atof(argv[i]);
+                  break;
+              case ARG_VOLUME:
+                  volume = atof(argv[i]);
                   break;
               case ARG_DAMPING:
                   damping = atof(argv[i]);
@@ -186,8 +194,8 @@ int main (int argc, char *argv[])
     }
 
     mix = dry;
-    earlyRD = size;
-    lateRD = size;
+    earlyRD = reflect;
+    lateRD = reflect;
 
     memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
@@ -205,7 +213,7 @@ int main (int argc, char *argv[])
     data.channels = sfinfo.channels;
     data.buffer = samples;
 
-    try_moorer(samples, &sfinfo, mix, earlyRD, lateRD, rt60, damping);
+    try_moorer(samples, &sfinfo, mix, earlyRD, lateRD, area, volume, damping);
     //init_moorer(samples, &sfinfo, FRAMES_PER_BUFFER, damping);
 
     // Play audio
