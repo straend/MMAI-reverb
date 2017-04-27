@@ -95,6 +95,8 @@ int main(int argc, char **argv)
     
     //Scales
     Wd->WetWidget = gtk_scale_new_with_range (GTK_ORIENTATION_VERTICAL, 0, 1, 0.01);
+    Wd->ReflectWidget = gtk_scqle_new_new_with_range (GTK_ORIENTATION_VERTICAL, 0, 1, 0.01);
+    Wd->DampWidget = gtk_scqle_new_new_with_range (GTK_ORIENTATION_VERTICAL, 0, 1, 0.01);	
     
     /* alignment */
     //InputAlign = gtk_alignment_new(0.5, 0.5, 0, 0);
@@ -114,6 +116,8 @@ int main(int argc, char **argv)
     
     // Widgets
     gtk_scale_get_layout (GTK_SCALE(Wd->WetWidget));
+    gtk_scale_get_layout (GTK_SCALE(Wd->ReflectWidget));
+    gtk_scale_get_layout (GTK_SCALE(Wd->DampWidget));
     
     /* Table */
     // GtkGrid *grid,GtkWidget *child,gint left,gint top,gint width,gint height
@@ -129,7 +133,8 @@ int main(int argc, char **argv)
     gtk_grid_attach(GTK_GRID(table), lb->AreaLabel, 3, 7, 1, 1);
     gtk_grid_attach(GTK_GRID(table), lb->VolumeLabel, 4, 7, 1, 1);
     gtk_grid_attach(GTK_GRID(table), Wd->WetWidget, 0, 5, 1, 4);
-
+    gtk_grid_attach(GTK_GRID(table), Wd->ReflectWidget, 1, 5, 1, 4);
+    gtk_grid_attach(GTK_GRID(table), Wd->DampWidget, 2, 5, 1, 4);
     
     // rows
     gtk_grid_set_row_homogeneous (GTK_GRID(table), FALSE);
