@@ -46,7 +46,7 @@ int main(int argc, char **argv)
 	GtkWidget * InputAlign = NULL;
 	GtkWidget * table = NULL;
 	GtkWidget *button_file;
-	
+
 	const gchar* sTitle;
 	gint sLargeur;
 	gint sHauteur;
@@ -74,7 +74,7 @@ int main(int argc, char **argv)
 	// Input label
 	lb->InputLabel = gtk_label_new("Input file");
 	// Bouton file
-	button_file = gtk_file_chooser_button_new (_("Select a song"),GTK_FILE_CHOOSER_ACTION_OPEN);
+	button_file = gtk_file_chooser_button_new (("Select a song"),GTK_FILE_CHOOSER_ACTION_OPEN);
 	gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (button_file),".");
 	// Output label
 	lb->OutputLabel = gtk_label_new("Output file");
@@ -139,7 +139,7 @@ int main(int argc, char **argv)
 	gtk_scale_get_layout (GTK_SCALE(Wd->Rt60Widget));
 	gtk_scale_get_layout (GTK_SCALE(Wd->AreaWidget));
 	gtk_scale_get_layout (GTK_SCALE(Wd->VolumeWidget));
-	
+
 	/* Table */
 	// GtkGrid *grid,GtkWidget *child,gint left,gint top,gint width,gint height
 	gtk_grid_attach(GTK_GRID(table), lb->InputLabel, 0, 0, 2, 1);
@@ -161,9 +161,9 @@ int main(int argc, char **argv)
 	gtk_grid_attach(GTK_GRID(table), Wd->Rt60Widget, 3, 5, 1, 4);
 	gtk_grid_attach(GTK_GRID(table), Wd->AreaWidget, 4, 6, 1, 4);
 	gtk_grid_attach(GTK_GRID(table), Wd->VolumeWidget, 5, 6, 1, 4);
-	
-	gtk_grid_attach(GTK_GRID(table), bouton_file, 0, 1, 2, 1);
-	
+
+	gtk_grid_attach(GTK_GRID(table), button_file, 0, 1, 2, 1);
+
 	// rows
 	gtk_grid_set_row_homogeneous (GTK_GRID(table), FALSE);
 	gtk_grid_set_row_spacing (GTK_GRID(table), 40);
