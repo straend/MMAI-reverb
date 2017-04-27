@@ -170,27 +170,25 @@ delay_line_s dl[TAPS];
 delay_line_s comb[COMBS];
 delay_line_s dla;
 
-void init_early(double *samples, SF_INFO *sfinfo)
+void init_early(double *samples, SF_INFO *sfinfo, double earlyRD)
 {
   for(uint8_t d=0;d<TAPS;d++){
-    init_delay(&dl[d], ER_TAPS[d], samples, sfinfo, ER_GAINS[d]);
+    init_delay(&dl[d], ER_TAPS[d]*earlyRD, samples, sfinfo, ER_GAINS[d]);
   }
 }
 
-void init_combs(double *samples, SF_INFO *sfinfo, double damping)
+void init_combs(double *samples, SF_INFO *sfinfo, double rt60, double damping)
 {
-  float rt60 = 3.0;
 
   for (uint8_t c = 0; c < COMBS; c++) {
     double g = pow(10.0, ((-3.0 * comb_delays[c]) / (rt60 * 1000.0)));
-    g=0.2;
     init_delay_comb(&comb[c], comb_delays[c], samples, sfinfo, g, comb_damp_freq[c]*damping);
   }
 }
 
-void init_allpass(double *samples, SF_INFO *sfinfo)
+void init_allpass(double *samples, SF_INFO *sfinfo, double lateRD)
 {
-  init_delay(&dla, 6, samples, sfinfo, 0.707);
+  init_delay(&dla, 6*lateRD, samples, sfinfo, 0.707);
 }
 
 void process_early_iter(double *input, const uint32_t iter)
@@ -203,7 +201,7 @@ void process_early_iter(double *input, const uint32_t iter)
       processed += y;
 
     }
-    input[i] = processed;
+    input[i] = processed/TAPS;
   }
 }
 void process_comb_iter(double *input, const uint32_t iter)
@@ -229,19 +227,23 @@ void process_allpass_iter(double *input, const uint32_t iter)
 
 double *early_reflections;
 double *late_reflections;
+double _mixWet;
 uint32_t cur_iter=0;
 
-void init_moorer(double *samples, SF_INFO *sfinfo, const uint32_t iter, 
-				double damping
+void init_moorer(double *samples, SF_INFO *sfinfo, const uint32_t iter,
+                 double mixWet, double earlyRD, double lateRD,
+                 double rt60, double damping
 )
 {
-  init_early(samples, sfinfo);
-  init_combs(samples, sfinfo, damping);
-  init_allpass(samples, sfinfo);
+  init_early(samples, sfinfo, earlyRD);
+  init_combs(samples, sfinfo, rt60, damping);
+  init_allpass(samples, sfinfo, lateRD);
   early_reflections=calloc(sizeof(double), iter);
   late_reflections=calloc(sizeof(double), iter);
   cur_iter = 0;
+    _mixWet = mixWet;
 }
+
 
 void process_moorer(const uint32_t iter, double *samples)
 {
@@ -251,11 +253,10 @@ void process_moorer(const uint32_t iter, double *samples)
   process_comb_iter(late_reflections, iter);
   process_allpass_iter(late_reflections, iter);
 
-  double dry = 0.3;
-  double wet = 1-dry;
 
+    double mixDry=1-_mixWet;
   for (uint32_t i=0; i<iter; i++) {
-    samples[i+cur_iter] = samples[i+cur_iter]*dry + late_reflections[i]*wet;
+    samples[i+cur_iter] = samples[i+cur_iter]*mixDry + late_reflections[i]*_mixWet;
   }
   cur_iter+=iter;
 }
@@ -299,15 +300,10 @@ void try_moorer(double *samples, SF_INFO *sfinfo,
 
     //proportional mix of dry and wet
     double mixDry=1-mixWet;
-    //other possibility is to make vary both
-    //dry and wet between 0 and 1
-    // double dry=0.7;
-    // double wet=0.6;
+
     for(uint32_t i=0; i<sfinfo->channels*sfinfo->frames;i++){
       samples[i] = samples[i] * mixDry + late_reflections[i]*mixWet;
-      //second possibility
-      //samples[i] = samples[i] * dry + late_reflections[i]*wet;
-    }
+     }
 
     free(early_reflections);
     free(late_reflections);

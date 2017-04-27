@@ -32,6 +32,7 @@ void init_delay(delay_line_s *dl, double delay_ms,
 );
 double process_delay(delay_line_s *dl, double x);
 
+void print_stuff(double *one, double *two, uint32_t start, uint32_t samples);
 
 void just_delays(double *input, SF_INFO *sf, double earlyRD);
 void allpass(double *input, SF_INFO *sf, double lateRD);
@@ -43,8 +44,10 @@ void try_moorer(double *samples, SF_INFO *sfinfo, double mix,
 );
 
 void init_moorer(double *samples, SF_INFO *sfinfo, const uint32_t iter,
-				double damping
+				 double mixWet, double earlyRD, double lateRD,
+				 double rt60, double damping
 );
+
 void process_moorer(const uint32_t iter, double *samples);
 void finnish_moorer();
 

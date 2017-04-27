@@ -41,14 +41,14 @@ volatile bool keep_playing = false;
     (void) statusFlags;
     (void) inputBuffer;
     //ou init_moorer
-    //process_moorer(framesPerBuffer, data->buffer);
+    process_moorer(framesPerBuffer, data->buffer);
 
     for( i=0; i<framesPerBuffer; i++ ) {
         for(uint8_t c=0;c<data->channels;c++)
-	    //out init_moorer
+	        //out init_moorer
             //*out++ = data->buffer[data->c_sample++];
-	    //out try_moorer
-	    *out++ = samples[data->c_sample++];
+	        //out try_moorer
+	        *out++ = samples[data->c_sample++];
         if(data->c_sample >= data->samples) {
             data->c_sample = 0;
             // Stop playing
@@ -248,9 +248,8 @@ int main (int argc, char *argv[])
     data.samples = sfinfo.frames*sfinfo.channels;
     data.channels = sfinfo.channels;
     data.buffer = samples;
-
-    try_moorer(samples, &sfinfo, wet, earlyRD, lateRD, rt60, damping);
-    //init_moorer(samples, &sfinfo, FRAMES_PER_BUFFER, damping);
+    //try_moorer(samples, &sfinfo, wet, earlyRD, lateRD, rt60, damping);
+    init_moorer(samples, &sfinfo, FRAMES_PER_BUFFER, wet, earlyRD, lateRD, rt60, damping);
 
     // Play audio
     outputParameters.channelCount = sfinfo.channels;
