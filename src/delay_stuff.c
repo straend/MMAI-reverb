@@ -247,17 +247,36 @@ void init_moorer(double *samples, SF_INFO *sfinfo, const uint32_t iter,
 
 void process_moorer(const uint32_t iter, double *samples)
 {
-  memcpy(early_reflections, samples+cur_iter, sizeof(double)*iter);
+
+  double *cpos = samples + cur_iter;
+  //memcpy(early_reflections, cpos, sizeof(double)*iter);
+  for(uint32_t i=0;i<iter;i++) {
+    early_reflections[i] = samples[cur_iter + i];
+    //printf("%f\t %f\n", early_reflections[i], samples[cur_iter+i]);
+  }
+  //print_stuff(samples, early_reflections, cur_iter, 5);
   process_early_iter(early_reflections, iter);
-  memcpy(late_reflections, early_reflections, sizeof(double)*iter);
+
+  //memcpy(late_reflections, early_reflections, sizeof(double)*iter);
+  for(uint32_t i=0;i<iter;i++) {
+    late_reflections[i] = early_reflections[i];
+    //printf("%f\t %f\n", early_reflections[i], late_reflections[i]);
+  }
   process_comb_iter(late_reflections, iter);
   process_allpass_iter(late_reflections, iter);
 
-
-    double mixDry=1-_mixWet;
-  for (uint32_t i=0; i<iter; i++) {
-    samples[i+cur_iter] = samples[i+cur_iter]*mixDry + late_reflections[i]*_mixWet;
+  for(uint32_t i=0;i<iter;i++) {
+//    printf("%f\t %f\n", early_reflections[i], late_reflections[i]);
   }
+
+  double mixDry=1-_mixWet;
+  for (uint32_t i=0; i<iter; i++) {
+    //double or = samples[cur_iter+i];
+    printf("\t%d\n", cur_iter+i);
+    samples[cur_iter+i] = samples[i+cur_iter]*mixDry + late_reflections[i]*_mixWet;
+    //printf("%f \t-> %f \n", or, samples[i+cur_iter]*mixDry + late_reflections[i]*_mixWet);
+  }
+
   cur_iter+=iter;
 }
 
@@ -277,10 +296,11 @@ void finnish_moorer()
 
 void print_stuff(double *one, double *two, uint32_t start, uint32_t samples)
 {
+  printf("#####%d####\n", start);
   for(uint32_t i=start; i<start+samples; i++){
     printf("%f \t %f \n", one[i], two[i]);
   }
-  printf("##############\n");
+
 }
 
 void try_moorer(double *samples, SF_INFO *sfinfo,

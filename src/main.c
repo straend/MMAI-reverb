@@ -44,11 +44,14 @@ volatile bool keep_playing = false;
     process_moorer(framesPerBuffer, data->buffer);
 
     for( i=0; i<framesPerBuffer; i++ ) {
-        for(uint8_t c=0;c<data->channels;c++)
+        for(uint8_t c=0;c<data->channels;c++){
 	        //out init_moorer
-            //*out++ = data->buffer[data->c_sample++];
+          printf("%d\n", data->c_sample);
+          *out++ = data->buffer[data->c_sample++];
 	        //out try_moorer
-	        *out++ = samples[data->c_sample++];
+	        //*out++ = samples[data->c_sample++];
+          //printf("%f \t \n", *out);
+        }
         if(data->c_sample >= data->samples) {
             data->c_sample = 0;
             // Stop playing
@@ -85,11 +88,11 @@ void print_usage(char *cmd_name)
    |                                                       | \n\
    |--damping   [0.0-1.0]    1                             | \n\
    │                                                       │ \n\
-   │--area      [0.0-100.0]   20                           │ \n\
+   │--area      [0.0-100.0]   20 m^2                       │ \n\
    |                                                       | \n\
-   |--volume    [0.0-200.0]   40                           | \n\
+   |--volume    [0.0-200.0]   40 m^3                       | \n\
    │                                                       │ \n\
-   │--out       filename to write Reverbed audio to        │ \n\
+   │--out       filename to write Reverbed audio (wav)     │ \n\
    │                                                       │ \n\
    │Example:                                               │ \n\
    │%s ../audio/saxGandalf.wav --dry 0.6 --rt60 5.3    │ \n\
