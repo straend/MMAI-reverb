@@ -34,10 +34,41 @@ typedef struct _Widget {
 	GtkWidget *PauseButton;
 } Widget;
 
-void user_function (GtkRange *range,
+void get_wet (GtkRange *range,
                gpointer  user_data)
 {
-    printf("Change -> %f\n", gtk_range_get_value(range));
+    printf("Wet -> %f\n", gtk_range_get_value(range));
+}
+
+void get_reflection (GtkRange *range,
+               gpointer  user_data)
+{
+    printf("Reflection -> %f\n", gtk_range_get_value(range));
+}
+
+void get_damping (GtkRange *range,
+               gpointer  user_data)
+{
+    printf("Damping -> %f\n", gtk_range_get_value(range));
+}
+
+GtkRange * get_rt60 (GtkRange *range,
+               gpointer  user_data)
+{
+    printf("Rt60 -> %f\n", gtk_range_get_value(range));
+    return range;
+}
+
+void get_area (GtkRange *range,
+               gpointer  user_data)
+{
+    printf("Area -> %f\n", gtk_range_get_value(range));
+}
+
+void get_volume (GtkRange *range,
+               gpointer  user_data)
+{
+    printf("Volume -> %f\n", gtk_range_get_value(range));
 }
 
 static void enter_callback( GtkWidget *widget, GtkWidget *entry )
@@ -45,6 +76,7 @@ static void enter_callback( GtkWidget *widget, GtkWidget *entry )
   const gchar *entry_text;
   entry_text = gtk_entry_get_text (GTK_ENTRY (entry));
   printf ("New file name entered: %s\n", entry_text);
+  //entry_text countains the new file name
 }
 
 
@@ -90,7 +122,7 @@ int main(int argc, char **argv)
 	lb->InputLabel = gtk_label_new("Input file");
 	// Button file
 	Wd->button_file = gtk_file_chooser_button_new (("Select a song"),GTK_FILE_CHOOSER_ACTION_OPEN);
-	gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (Wd->button_file),".");
+	gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (Wd->button_file),"../audio/");
 	// Output label
 	lb->OutputLabel = gtk_label_new("Output file");
 	// Entry
@@ -154,13 +186,19 @@ int main(int argc, char **argv)
 	gtk_range_set_inverted(GTK_RANGE(Wd->AreaWidget), TRUE);
 	gtk_range_set_inverted(GTK_RANGE(Wd->VolumeWidget), TRUE);
 
-	/* alignment */
 	// set Entry 
 	//gtk_entry_set_buffer (GTK_ENTRY(Wd->OutputWidget), outputFileName);
 	gtk_entry_set_text (GTK_ENTRY(Wd->OutputWidget), fileEx);
 	
 	g_signal_connect(G_OBJECT(MainWindow), "delete-event", G_CALLBACK(gtk_main_quit), NULL);
-	g_signal_connect (G_OBJECT(Wd->WetWidget), "value-changed", G_CALLBACK (user_function), NULL);
+	g_signal_connect (G_OBJECT(Wd->WetWidget), "value-changed", G_CALLBACK (get_wet), NULL);
+	g_signal_connect(G_OBJECT(Wd->ReflectWidget), "value-changed", G_CALLBACK (get_reflection), NULL);
+	g_signal_connect(G_OBJECT(Wd->DampWidget), "value-changed", G_CALLBACK (get_damping), NULL);
+	
+	g_signal_connect(G_OBJECT(Wd->Rt60Widget), "value-changed", G_CALLBACK (get_rt60), NULL);
+	
+	g_signal_connect(G_OBJECT(Wd->AreaWidget), "value-changed", G_CALLBACK (get_area), NULL);
+	g_signal_connect(G_OBJECT(Wd->VolumeWidget), "value-changed", G_CALLBACK (get_volume), NULL);
 
 	gtk_container_set_border_width (GTK_CONTAINER(MainWindow), 20);
 
@@ -238,7 +276,7 @@ int main(int argc, char **argv)
 
 	
 	/* Display and event loops */
-	printf("\n-------\nWindow\n------- \n \nTitle: %s \nSize: %d x %d \nPosition: %dy %dx\nIcone: ", sTitle, sLargeur, sHauteur, sPosition_y, sPosition_x);
+	printf("\n-------\nWindow\n------- \n \nTitle: %s \nSize: %d x %d \nPosition: %dy %dx\n ", sTitle, sLargeur, sHauteur, sPosition_y, sPosition_x);
 
 	gtk_widget_show_all(MainWindow);
 	gtk_main();
