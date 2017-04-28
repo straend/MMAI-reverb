@@ -28,6 +28,8 @@ typedef struct _Widget {
 	GtkWidget *Rt60Widget;
 	GtkWidget *AreaWidget;
 	GtkWidget *VolumeWidget;
+	GtkWidget *button_file;
+	GtkWidget *OutputWidget;
 } Widget;
 
 void user_function (GtkRange *range,
@@ -35,6 +37,14 @@ void user_function (GtkRange *range,
 {
     printf("Change -> %f\n", gtk_range_get_value(range));
 }
+
+static void enter_callback( GtkWidget *widget, GtkWidget *entry )
+{
+  const gchar *entry_text;
+  entry_text = gtk_entry_get_text (GTK_ENTRY (entry));
+  printf ("New file name entered: %s\n", entry_text);
+}
+
 
 int main(int argc, char **argv)
 {
@@ -45,7 +55,6 @@ int main(int argc, char **argv)
 	Widget * Wd;
 	GtkWidget * InputAlign = NULL;
 	GtkWidget * table = NULL;
-	GtkWidget *button_file;
 
 	const gchar* sTitle;
 	gint sLargeur;
@@ -53,6 +62,8 @@ int main(int argc, char **argv)
 	gint sPosition_y;
 	gint sPosition_x;
 	int icone;
+	const gchar *fileEx = "file.wav";
+	//GtkEntryBuffer * outputFileName;
 
 	/* Initialisation of GTK+ */
 	gtk_init(&argc, &argv);
@@ -67,6 +78,7 @@ int main(int argc, char **argv)
 	gtk_window_set_title(GTK_WINDOW(MainWindow), "Sound Mixer");
 	// Size
 	gtk_window_set_default_size(GTK_WINDOW(MainWindow), 580, 460);
+	gtk_window_set_resizable (GTK_WINDOW(MainWindow), FALSE);
 	// Position
 	gtk_window_set_position(GTK_WINDOW (MainWindow), GTK_WIN_POS_CENTER);
 	// Icone
@@ -74,10 +86,18 @@ int main(int argc, char **argv)
 	// Input label
 	lb->InputLabel = gtk_label_new("Input file");
 	// Bouton file
-	button_file = gtk_file_chooser_button_new (("Select a song"),GTK_FILE_CHOOSER_ACTION_OPEN);
-	gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (button_file),".");
+	Wd->button_file = gtk_file_chooser_button_new (("Select a song"),GTK_FILE_CHOOSER_ACTION_OPEN);
+	gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (Wd->button_file),".");
 	// Output label
 	lb->OutputLabel = gtk_label_new("Output file");
+	// Entry
+	Wd->OutputWidget = gtk_entry_new ();
+	//gtk_entry_get_buffer (GTK_ENTRY(Wd->OutputWidget));
+	gtk_entry_set_max_length (GTK_ENTRY (Wd->OutputWidget), 50);
+	gtk_entry_set_visibility (GTK_ENTRY(Wd->OutputWidget), TRUE);
+	
+	g_signal_connect (Wd->OutputWidget, "activate", G_CALLBACK (enter_callback),Wd->OutputWidget);
+	
 	// Play label
 	lb->PlayLabel = gtk_label_new("Play song");
 	// Stop label
@@ -107,20 +127,19 @@ int main(int argc, char **argv)
 	Wd->Rt60Widget = gtk_scale_new_with_range (GTK_ORIENTATION_VERTICAL, 0, 10, 0.1);
 	Wd->AreaWidget = gtk_scale_new_with_range (GTK_ORIENTATION_VERTICAL, 0, 10000, 1);
 	Wd->VolumeWidget = gtk_scale_new_with_range (GTK_ORIENTATION_VERTICAL, 0, 200000, 1);
-	gtk_range_set_inverted(Wd->WetWidget, TRUE);
-	gtk_range_set_inverted(Wd->ReflectWidget, TRUE);
-	gtk_range_set_inverted(Wd->DampWidget, TRUE);
-	gtk_range_set_inverted(Wd->Rt60Widget, TRUE);
-	gtk_range_set_inverted(Wd->AreaWidget, TRUE);
-	gtk_range_set_inverted(Wd->VolumeWidget, TRUE);
+	gtk_range_set_inverted(GTK_RANGE(Wd->WetWidget), TRUE);
+	gtk_range_set_inverted(GTK_RANGE(Wd->ReflectWidget), TRUE);
+	gtk_range_set_inverted(GTK_RANGE(Wd->DampWidget), TRUE);
+	gtk_range_set_inverted(GTK_RANGE(Wd->Rt60Widget), TRUE);
+	gtk_range_set_inverted(GTK_RANGE(Wd->AreaWidget), TRUE);
+	gtk_range_set_inverted(GTK_RANGE(Wd->VolumeWidget), TRUE);
 
 	/* alignment */
-	//InputAlign = gtk_alignment_new(0.5, 0.5, 0, 0);
-
-
-	g_signal_connect(G_OBJECT(MainWindow), "delete-event",
-						G_CALLBACK(gtk_main_quit), NULL);
-
+	// set Entry 
+	//gtk_entry_set_buffer (GTK_ENTRY(Wd->OutputWidget), outputFileName);
+	gtk_entry_set_text (GTK_ENTRY(Wd->OutputWidget), fileEx);
+	
+	g_signal_connect(G_OBJECT(MainWindow), "delete-event", G_CALLBACK(gtk_main_quit), NULL);
 	g_signal_connect (G_OBJECT(Wd->WetWidget), "value-changed", G_CALLBACK (user_function), NULL);
 
 	gtk_container_set_border_width (GTK_CONTAINER(MainWindow), 20);
@@ -142,8 +161,8 @@ int main(int argc, char **argv)
 
 	/* Table */
 	// GtkGrid *grid,GtkWidget *child,gint left,gint top,gint width,gint height
-	gtk_grid_attach(GTK_GRID(table), lb->InputLabel, 0, 0, 2, 1);
-	gtk_grid_attach(GTK_GRID(table), lb->OutputLabel, 2, 0, 2, 1);
+	gtk_grid_attach(GTK_GRID(table), lb->InputLabel, 0, 0, 3, 1);
+	gtk_grid_attach(GTK_GRID(table), lb->OutputLabel, 3, 0, 3, 1);
 	gtk_grid_attach(GTK_GRID(table), lb->PlayLabel, 1, 3, 2, 1);
 	gtk_grid_attach(GTK_GRID(table), lb->StopLabel, 2, 3, 2, 1);
 	gtk_grid_attach(GTK_GRID(table), lb->WetLabel, 0, 4, 1, 1);
@@ -155,21 +174,22 @@ int main(int argc, char **argv)
 	gtk_grid_attach(GTK_GRID(table), lb->VolumeLabel, 5, 5, 1, 1);
 
 
-	gtk_grid_attach(GTK_GRID(table), Wd->WetWidget, 0, 5, 1, 4);
-	gtk_grid_attach(GTK_GRID(table), Wd->ReflectWidget, 1, 5, 1, 4);
-	gtk_grid_attach(GTK_GRID(table), Wd->DampWidget, 2, 5, 1, 4);
-	gtk_grid_attach(GTK_GRID(table), Wd->Rt60Widget, 3, 5, 1, 4);
+	gtk_grid_attach(GTK_GRID(table), Wd->WetWidget, 0, 5, 1, 5);
+	gtk_grid_attach(GTK_GRID(table), Wd->ReflectWidget, 1, 5, 1, 5);
+	gtk_grid_attach(GTK_GRID(table), Wd->DampWidget, 2, 5, 1, 5);
+	gtk_grid_attach(GTK_GRID(table), Wd->Rt60Widget, 3, 5, 1, 5);
 	gtk_grid_attach(GTK_GRID(table), Wd->AreaWidget, 4, 6, 1, 4);
 	gtk_grid_attach(GTK_GRID(table), Wd->VolumeWidget, 5, 6, 1, 4);
 
-	gtk_grid_attach(GTK_GRID(table), button_file, 0, 1, 2, 1);
+	gtk_grid_attach(GTK_GRID(table), Wd->button_file, 0, 1, 3, 1);
+	gtk_grid_attach(GTK_GRID(table), Wd->OutputWidget, 3, 1, 3, 1);
 
 	// rows
 	gtk_grid_set_row_homogeneous (GTK_GRID(table), FALSE);
-	gtk_grid_set_row_spacing (GTK_GRID(table), 40);
+	gtk_grid_set_row_spacing (GTK_GRID(table), 30);
 	// columms
 	gtk_grid_set_column_homogeneous (GTK_GRID(table), FALSE);
-	gtk_grid_set_column_spacing (GTK_GRID(table), 100);
+	gtk_grid_set_column_spacing (GTK_GRID(table), 80);
 
 	/* Get information for the window */
 	// Title
@@ -184,10 +204,11 @@ int main(int argc, char **argv)
 	// Column
 	gtk_grid_get_column_homogeneous (GTK_GRID(table));
 	gtk_grid_get_column_spacing (GTK_GRID(table));
-
-	// Input Label
-	//gtk_container_add (GTK_CONTAINER (InputContainer), lb->InputLabel);
-
+	
+	// Entry out
+	gtk_entry_get_text (GTK_ENTRY(Wd->OutputWidget));
+	gtk_editable_select_region (GTK_EDITABLE (Wd->OutputWidget), 0, 3);
+	
 	/* Display and event loops */
 	printf("\n-------\nWindow\n------- \n \nTitle: %s \nSize: %d x %d \nPosition: %dy %dx\nIcone: ", sTitle, sLargeur, sHauteur, sPosition_y, sPosition_x);
 
