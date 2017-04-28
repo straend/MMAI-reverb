@@ -9,8 +9,16 @@ find_library(REQUIRED portaudio IMPORTED )
 include_directories(${SNDFILE_INCLUDE_DIRS})
 include_directories(${PORTAUDIO_INCLUDE_DIRS})
 
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
+include_directories(${GTK3_INCLUDE_DIRS})
+link_directories(${GTK3_LIBRARY_DIRS})
+add_definitions(${GTK3_CFLAGS_OTHER})
 
 set(SOURCE_FILES src/main.c src/reverb_fake.c src/reverb_fake.h src/delay_stuff.c src/delay_stuff.h)
 add_executable(mmai ${SOURCE_FILES})
+
+add_executable(GUI src/GUI.c)
+target_link_libraries(GUI ${GTK3_LIBRARIES})
 
 target_link_libraries(mmai sndfile portaudio m)
