@@ -28,9 +28,9 @@ void delay_line(float *buffer, SF_INFO *sfinfo, float decay){
 float D[M];     // initialized to zero
 long ptr=0;     // read-write offset
 
-double delayline(double x)
+float delayline(float x)
 {
-    double y = D[ptr]; // read operation
+    float y = D[ptr]; // read operation
     D[ptr++] = x;      // write operation
     if (ptr >= M) {
         ptr -= M;

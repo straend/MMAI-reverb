@@ -16,12 +16,12 @@ typedef struct {
     uint32_t c_sample;
     sf_count_t samples;
     uint8_t  channels;
-    double *buffer;
+    float *buffer;
 } paTestData;
 
-double *samples;
-
-#define FRAMES_PER_BUFFER (64)
+float *samples;
+uint32_t  processed=0;
+#define FRAMES_PER_BUFFER (1024)
 volatile bool keep_playing = false;
 
 
@@ -40,18 +40,16 @@ volatile bool keep_playing = false;
     (void) timeInfo;
     (void) statusFlags;
     (void) inputBuffer;
-    //ou init_moorer
-    process_moorer(framesPerBuffer, data->buffer);
 
-    for( i=0; i<framesPerBuffer; i++ ) {
-        for(uint8_t c=0;c<data->channels;c++){
-	        //out init_moorer
-          printf("%d\n", data->c_sample);
-          *out++ = data->buffer[data->c_sample++];
-	        //out try_moorer
-	        //*out++ = samples[data->c_sample++];
-          //printf("%f \t \n", *out);
-        }
+    float *d = data->buffer;
+    d+=data->c_sample;
+    uint32_t  to_process = framesPerBuffer*data->channels;
+    if(to_process+data->c_sample > data->samples)
+        to_process = data->samples - data->c_sample;
+
+    process_moorer(to_process, d);
+    for( i=0; i<to_process; i++ ) {
+        *out++ = data->buffer[data->c_sample++];
         if(data->c_sample >= data->samples) {
             data->c_sample = 0;
             // Stop playing
@@ -105,7 +103,7 @@ void print_usage(char *cmd_name)
 int main (int argc, char *argv[])
 {
     char    *infilename=NULL, *outfilename=NULL;
-    double mix=0, earlyRD=0, lateRD=0;/* max mix is 1, max earlyRD is 1, init values of delay are maximum */
+    float mix=0, earlyRD=0, lateRD=0;/* max mix is 1, max earlyRD is 1, init values of delay are maximum */
     SNDFILE   *outfile  = NULL;
     SNDFILE   *infile   = NULL ;
     SF_INFO   sfinfo, sfinfo_out;
@@ -229,8 +227,8 @@ int main (int argc, char *argv[])
        * A = (Σ surface area (S) x α) = absorption area of the room, m2
        * For a frequency of 100Hz and 4mm glass as materia matCoef = 0.07
        */
-        double matCoef = 0.07;
-        double A = area*matCoef;
+        float matCoef = 0.07;
+        float A = area*matCoef;
         rt60 = 0.16*volume/A;
     }
     earlyRD = reflect;
@@ -245,8 +243,8 @@ int main (int argc, char *argv[])
 
 
     // Read samples to array
-    samples = malloc(sizeof(double) *  sfinfo.frames * sfinfo.channels);
-    sf_readf_double (infile, samples, sfinfo.frames);
+    samples = malloc(sizeof(float) *  sfinfo.frames * sfinfo.channels);
+    sf_readf_float(infile, samples, sfinfo.frames);
     sf_close (infile);
     data.samples = sfinfo.frames*sfinfo.channels;
     data.channels = sfinfo.channels;
@@ -289,7 +287,7 @@ int main (int argc, char *argv[])
     // Wait until we have played all samples
     keep_playing = true;
     while (keep_playing);
-
+    printf("Processed: %d\n", processed);
 
   // Save audio
   if( NULL != outfilename) {
@@ -302,7 +300,7 @@ int main (int argc, char *argv[])
 
     printf("Writing output to: %s\n", outfilename);
     sfinfo_out.frames = sfinfo.frames;
-    sf_writef_double(outfile, samples, sfinfo_out.frames);
+    sf_writef_float(outfile, samples, sfinfo_out.frames);
     sf_close(outfile);
   }
 
