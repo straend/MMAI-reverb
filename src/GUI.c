@@ -30,6 +30,8 @@ typedef struct _Widget {
 	GtkWidget *VolumeWidget;
 	GtkWidget *button_file;
 	GtkWidget *OutputWidget;
+	GtkWidget *PlayButton;
+	GtkWidget *PauseButton;
 } Widget;
 
 void user_function (GtkRange *range,
@@ -50,7 +52,6 @@ int main(int argc, char **argv)
 {
 	/* Variables */
 	GtkWidget * MainWindow = NULL;
-	//GtkWidget * InputContainer = NULL;
 	Label *lb;
 	Widget * Wd;
 	GtkWidget * InputAlign = NULL;
@@ -64,6 +65,8 @@ int main(int argc, char **argv)
 	int icone;
 	const gchar *fileEx = "file.wav";
 	//GtkEntryBuffer * outputFileName;
+	GtkWidget * play;
+	GtkWidget * pause;
 
 	/* Initialisation of GTK+ */
 	gtk_init(&argc, &argv);
@@ -85,7 +88,7 @@ int main(int argc, char **argv)
 	icone = gtk_window_set_icon_from_file(GTK_WINDOW(MainWindow), "icone.png", NULL);
 	// Input label
 	lb->InputLabel = gtk_label_new("Input file");
-	// Bouton file
+	// Button file
 	Wd->button_file = gtk_file_chooser_button_new (("Select a song"),GTK_FILE_CHOOSER_ACTION_OPEN);
 	gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (Wd->button_file),".");
 	// Output label
@@ -95,8 +98,25 @@ int main(int argc, char **argv)
 	//gtk_entry_get_buffer (GTK_ENTRY(Wd->OutputWidget));
 	gtk_entry_set_max_length (GTK_ENTRY (Wd->OutputWidget), 50);
 	gtk_entry_set_visibility (GTK_ENTRY(Wd->OutputWidget), TRUE);
-	
 	g_signal_connect (Wd->OutputWidget, "activate", G_CALLBACK (enter_callback),Wd->OutputWidget);
+	
+	play = gtk_image_new_from_file ("rsz_play.jpg");
+	pause = gtk_image_new_from_file ("rsz_pause.jpg");
+	//gtk_image_set_pixel_size (GTK_IMAGE(play), 10);
+    //gtk_image_set_pixel_size (GTK_IMAGE(pause), 10);       
+	
+	// Play Button and pause buttons
+	Wd->PlayButton = gtk_button_new();
+	Wd->PauseButton = gtk_button_new();
+	//Wd->PlayButton = gtk_button_new_from_icon_name("play.jpeg", GTK_ICON_SIZE_BUTTON);
+	//Wd->PauseButton = gtk_button_new_from_icon_name("pause.jpeg", GTK_ICON_SIZE_BUTTON);
+	gtk_widget_set_hexpand (Wd->PlayButton, TRUE);
+    gtk_widget_set_halign (Wd->PlayButton, GTK_ALIGN_START);
+	gtk_widget_set_hexpand (Wd->PauseButton, TRUE);
+    gtk_widget_set_halign (Wd->PauseButton, GTK_ALIGN_START);
+    
+	gtk_button_set_image (GTK_BUTTON(Wd->PlayButton), play);
+	gtk_button_set_image (GTK_BUTTON(Wd->PauseButton), pause);
 	
 	// Play label
 	lb->PlayLabel = gtk_label_new("Play song");
@@ -144,10 +164,6 @@ int main(int argc, char **argv)
 
 	gtk_container_set_border_width (GTK_CONTAINER(MainWindow), 20);
 
-	/* Create an EventBox and add it to our toplevel window */
-	//InputContainer = gtk_event_box_new ();
-	//gtk_container_add (GTK_CONTAINER(MainWindow), InputContainer);
-
 	// add table in Window
 	gtk_container_add(GTK_CONTAINER(MainWindow), GTK_WIDGET(table));
 
@@ -163,26 +179,29 @@ int main(int argc, char **argv)
 	// GtkGrid *grid,GtkWidget *child,gint left,gint top,gint width,gint height
 	gtk_grid_attach(GTK_GRID(table), lb->InputLabel, 0, 0, 3, 1);
 	gtk_grid_attach(GTK_GRID(table), lb->OutputLabel, 3, 0, 3, 1);
-	gtk_grid_attach(GTK_GRID(table), lb->PlayLabel, 1, 3, 2, 1);
-	gtk_grid_attach(GTK_GRID(table), lb->StopLabel, 2, 3, 2, 1);
-	gtk_grid_attach(GTK_GRID(table), lb->WetLabel, 0, 4, 1, 1);
-	gtk_grid_attach(GTK_GRID(table), lb->ReflectLabel, 1, 4, 1, 1);
-	gtk_grid_attach(GTK_GRID(table), lb->DampLabel, 2, 4, 1, 1);
-	gtk_grid_attach(GTK_GRID(table), lb->Rt60Label, 3, 4, 1, 1);
-	gtk_grid_attach(GTK_GRID(table), lb->RoomSizeLabel, 4, 4, 2, 1);
-	gtk_grid_attach(GTK_GRID(table), lb->AreaLabel, 4, 5, 1, 1);
-	gtk_grid_attach(GTK_GRID(table), lb->VolumeLabel, 5, 5, 1, 1);
+	gtk_grid_attach(GTK_GRID(table), lb->PlayLabel, 1, 2, 1, 1);
+	gtk_grid_attach(GTK_GRID(table), lb->StopLabel, 3, 2, 1, 1);
+	gtk_grid_attach(GTK_GRID(table), lb->WetLabel, 0, 5, 1, 1);
+	gtk_grid_attach(GTK_GRID(table), lb->ReflectLabel, 1, 5, 1, 1);
+	gtk_grid_attach(GTK_GRID(table), lb->DampLabel, 2, 5, 1, 1);
+	gtk_grid_attach(GTK_GRID(table), lb->Rt60Label, 3, 5, 1, 1);
+	gtk_grid_attach(GTK_GRID(table), lb->RoomSizeLabel, 4, 5, 2, 1);
+	gtk_grid_attach(GTK_GRID(table), lb->AreaLabel, 4, 6, 1, 1);
+	gtk_grid_attach(GTK_GRID(table), lb->VolumeLabel, 5, 6, 1, 1);
 
 
-	gtk_grid_attach(GTK_GRID(table), Wd->WetWidget, 0, 5, 1, 5);
-	gtk_grid_attach(GTK_GRID(table), Wd->ReflectWidget, 1, 5, 1, 5);
-	gtk_grid_attach(GTK_GRID(table), Wd->DampWidget, 2, 5, 1, 5);
-	gtk_grid_attach(GTK_GRID(table), Wd->Rt60Widget, 3, 5, 1, 5);
-	gtk_grid_attach(GTK_GRID(table), Wd->AreaWidget, 4, 6, 1, 4);
-	gtk_grid_attach(GTK_GRID(table), Wd->VolumeWidget, 5, 6, 1, 4);
+	gtk_grid_attach(GTK_GRID(table), Wd->WetWidget, 0, 6, 1, 5);
+	gtk_grid_attach(GTK_GRID(table), Wd->ReflectWidget, 1, 6, 1, 5);
+	gtk_grid_attach(GTK_GRID(table), Wd->DampWidget, 2, 6, 1, 5);
+	gtk_grid_attach(GTK_GRID(table), Wd->Rt60Widget, 3, 6, 1, 5);
+	gtk_grid_attach(GTK_GRID(table), Wd->AreaWidget, 4, 7, 1, 4);
+	gtk_grid_attach(GTK_GRID(table), Wd->VolumeWidget, 5, 7, 1, 4);
 
 	gtk_grid_attach(GTK_GRID(table), Wd->button_file, 0, 1, 3, 1);
 	gtk_grid_attach(GTK_GRID(table), Wd->OutputWidget, 3, 1, 3, 1);
+
+	gtk_grid_attach(GTK_GRID(table), Wd->PlayButton, 1, 3, 1, 1);
+	gtk_grid_attach(GTK_GRID(table), Wd->PauseButton, 3, 3, 1, 1);
 
 	// rows
 	gtk_grid_set_row_homogeneous (GTK_GRID(table), FALSE);
@@ -208,6 +227,15 @@ int main(int argc, char **argv)
 	// Entry out
 	gtk_entry_get_text (GTK_ENTRY(Wd->OutputWidget));
 	gtk_editable_select_region (GTK_EDITABLE (Wd->OutputWidget), 0, 3);
+	
+	//image size
+	//gtk_image_get_pixel_size (GTK_IMAGE(play));
+	//gtk_image_get_pixel_size (GTK_IMAGE(pause));
+	
+	// Display images of the buttons
+	gtk_button_get_image (GTK_BUTTON(Wd->PlayButton));
+	gtk_button_get_image (GTK_BUTTON(Wd->PauseButton));
+
 	
 	/* Display and event loops */
 	printf("\n-------\nWindow\n------- \n \nTitle: %s \nSize: %d x %d \nPosition: %dy %dx\nIcone: ", sTitle, sLargeur, sHauteur, sPosition_y, sPosition_x);
