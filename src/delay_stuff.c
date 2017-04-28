@@ -30,6 +30,11 @@ const float ER_GAINS[] = {
 const float comb_delays[] = {50, 56, 61, 68, 72, 78};
 const float comb_damp_freq[] = {1942, 1362, 1312, 1574, 981, 1036};
 
+// Global *ugly* variables for our delay_lines
+delay_line_s dl[TAPS];
+delay_line_s comb[COMBS];
+delay_line_s dla;
+
 void init_delay(delay_line_s *dl, float delay_ms,
 				float *input, SF_INFO *sf, float gain
 )
@@ -39,12 +44,69 @@ void init_delay(delay_line_s *dl, float delay_ms,
     dl->sf = sf;
     dl->ptr = 0;
     dl->delay_samples = (uint64_t) ((float)(sf->samplerate) * (delay_ms/1000));
-    dl->delay = calloc(sizeof(float), dl->delay_samples);
+
+    // Preallocate double of needed memory for our delayline
+    dl->delay = calloc(sizeof(float), dl->delay_samples*2);
+    dl->samplerate = sf->samplerate;
+    
     if (NULL == dl->delay){
         printf("FAIL FAIL\n");
     }
     dl->gain = gain;
-    //printf("Gain: %5.4f \t delay_ms: %5.5f \t samples: %d \t samplerat: %d\n", dl->gain, dl->delay_ms, dl->delay_samples, sf->samplerate);
+}
+
+void set_delay(delay_line_s *dl, float delay_ms, float gain)
+{
+  uint32_t old_delay_samples = dl->delay_samples;
+  dl->delay_ms = delay_ms;
+  dl->delay_samples = (uint64_t) ((float)(dl->sf->samplerate) * (dl->delay_ms/1000));
+  dl->gain = gain;
+  // Check if we need to reallocate memory for our delay_line, if so MAKE IT DOUBLE the needed size
+  // (reallocs are not nice (or fast))
+  // @TODO: do some interpolating or other magic on values if we need more room
+  if (dl->delay_samples>old_delay_samples*2){
+    dl->delay = realloc(dl->delay, sizeof(float) * dl->delay_samples*2);
+  }
+}
+
+void set_delay_comb(delay_line_s *dl, float delay_ms, float gain, float cutoff)
+{
+  set_delay(dl, delay_ms, gain);
+  float costh = 2.0 - cos(2.0 * M_PI * cutoff / dl->sf->samplerate);
+  dl->lp_coef = sqrt(costh * costh - 1.0) - costh;
+
+}
+void set_earlyRD(float earlyRD)
+{
+  for(uint8_t d=0;d<TAPS;d++){
+    set_delay(&dl[d], ER_TAPS[d]*earlyRD, ER_GAINS[d]);
+  }
+}
+void set_damping(float damping)
+{
+  for(uint8_t d=0;d<TAPS;d++){
+    dl[d].gain = ER_GAINS[d]*damping;
+  }
+}
+
+void set_cutoff(float cutoff)
+{
+  for(uint8_t d=0;d<TAPS;d++){
+    float costh = 2.0 - cos(2.0 * M_PI * cutoff / dl[d].sf->samplerate);
+    dl[d].lp_coef = sqrt(costh * costh - 1.0) - costh;
+  }
+}
+
+/**
+ * Sets the rt60 parameter on the fly, (decay time)
+ * @param rt60
+ */
+void set_rt60(float rt60)
+{
+  for (uint8_t c = 0; c < COMBS; c++) {
+    float g = pow(10.0, ((-3.0 * comb_delays[c]) / (rt60 * 1000.0)));
+    comb[c].gain = g;
+  }
 }
 
 void init_delay_comb(delay_line_s *dl, float delay_ms,
@@ -105,9 +167,6 @@ float process_comb(delay_line_s *dl, float x)
     return y;
 }
 
-delay_line_s dl[TAPS];
-delay_line_s comb[COMBS];
-delay_line_s dla;
 
 void init_early(float *samples, SF_INFO *sfinfo, float earlyRD)
 {

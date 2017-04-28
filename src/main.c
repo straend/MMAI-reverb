@@ -48,6 +48,7 @@ volatile bool keep_playing = false;
         to_process = data->samples - data->c_sample;
 
     process_moorer(to_process, d);
+    processed += to_process;
     for( i=0; i<to_process; i++ ) {
         *out++ = data->buffer[data->c_sample++];
         if(data->c_sample >= data->samples) {
@@ -286,7 +287,19 @@ int main (int argc, char *argv[])
 
     // Wait until we have played all samples
     keep_playing = true;
-    while (keep_playing);
+    bool changed = false;
+    while (keep_playing){
+        if (!changed && processed > data.samples/2){
+            printf("CJANGE\n");
+            changed = true;
+            //set_rt60(0.1);
+            //set_earlyRD(0.1);
+            set_cutoff(0.5);
+
+
+
+        }
+    }
     printf("Processed: %d\n", processed);
 
   // Save audio

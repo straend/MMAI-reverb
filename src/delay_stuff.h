@@ -18,6 +18,7 @@ typedef struct{
     float *input;
     float delay_ms;
     uint64_t delay_samples;
+	uint64_t samplerate;
     uint64_t ptr;
     SF_INFO *sf;
     float *delay;
@@ -50,6 +51,14 @@ void init_moorer(float *samples, SF_INFO *sfinfo, const uint32_t iter,
 
 void process_moorer(const uint32_t iter, float *samples);
 void finnish_moorer();
+
+void set_rt60(float rt60);
+void set_earlyRD(float earlyRD);
+void set_damping(float damping);
+void set_cutoff(float cutoff);
+
+
+
 
 
 #endif //MMAI_DELAY_STUFF_H
