@@ -75,11 +75,20 @@ GtkRange * get_volume (GtkRange *range,
     return range;
 }
 
-gboolean get_pressed_play (GtkWidget *widget, GdkEvent  *event,
-							gpointer   user_data)
+gboolean play_button (GtkWidget *widget, gpointer user_data)
 {
+    gboolean bplay = FALSE;
+    bplay = TRUE;
+    g_print ("play was pressed, bplay = %d\n", bplay);
+    return bplay;
+}
 
-
+gboolean pause_button (GtkWidget *widget, gpointer user_data)
+{
+    gboolean bpause = FALSE;
+    bpause = TRUE;
+    g_print ("pause was pressed, bpause = %d\n", bpause);
+    return bpause;
 }
 
 static void enter_callback( GtkWidget *widget, GtkWidget *entry )
@@ -200,6 +209,9 @@ int main(int argc, char **argv)
 	// set Entry 
 	//gtk_entry_set_buffer (GTK_ENTRY(Wd->OutputWidget), outputFileName);
 	gtk_entry_set_text (GTK_ENTRY(Wd->OutputWidget), fileEx);
+	
+	g_signal_connect (G_OBJECT(Wd->PlayButton), "clicked", G_CALLBACK(play_button), NULL);
+	g_signal_connect (G_OBJECT(Wd->PauseButton), "clicked", G_CALLBACK(pause_button), NULL);
 	
 	g_signal_connect(G_OBJECT(MainWindow), "delete-event", G_CALLBACK(gtk_main_quit), NULL);
 	g_signal_connect (G_OBJECT(Wd->WetWidget), "value-changed", G_CALLBACK (get_wet), NULL);

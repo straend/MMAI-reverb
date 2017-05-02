@@ -21,6 +21,9 @@ GtkRange * get_area (GtkRange *range, gpointer  user_data);
 
 GtkRange * get_volume (GtkRange *range, gpointer  user_data);
 
+gboolean play_button (GtkWidget *widget, gpointer user_data);
+gboolean pause_button (GtkWidget *widget, gpointer user_data);
+
 static void enter_callback( GtkWidget *widget, GtkWidget *entry );
 
 
