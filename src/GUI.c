@@ -80,14 +80,17 @@ gboolean play_button (GtkWidget *widget, gpointer user_data)
     gboolean bplay = FALSE;
     bplay = TRUE;
     g_print ("play was pressed, bplay = %d\n", bplay);
+    start_playback();
     return bplay;
 }
 
 gboolean pause_button (GtkWidget *widget, gpointer user_data)
 {
-    gboolean bpause = FALSE;
-    bpause = TRUE;
+    static gboolean bpause = FALSE;
     g_print ("pause was pressed, bpause = %d\n", bpause);
+
+    pause_playback(bpause);
+    bpause = !bpause;
     return bpause;
 }
 
@@ -99,12 +102,15 @@ const gchar * enter_callback( GtkWidget *widget, GtkWidget *entry )
   //entry_text countains the new file name
   return entry_text;
 }
+void file_selected_callback (GtkFileChooserButton *widget, gpointer user_data)
+{
+  char *fname = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(widget));
+  file_selected(fname);
+}
 
-
-int main(int argc, char **argv)
+void init_gui(GtkWidget *MainWindow)
 {
 	/* Variables */
-	GtkWidget * MainWindow = NULL;
 	Label *lb;
 	Widget * Wd;
 	GtkWidget * InputAlign = NULL;
@@ -121,15 +127,10 @@ int main(int argc, char **argv)
 	GtkWidget * play;
 	GtkWidget * pause;
 
-	/* Initialisation of GTK+ */
-	gtk_init(&argc, &argv);
-
 	/* allocation */
 	lb = g_malloc( sizeof(Label) );
 	Wd = g_malloc( sizeof(Widget) );
 
-	/* Creation of the window */
-	MainWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	// Title
 	gtk_window_set_title(GTK_WINDOW(MainWindow), "Sound Mixer");
 	// Size
@@ -138,7 +139,7 @@ int main(int argc, char **argv)
 	// Position
 	gtk_window_set_position(GTK_WINDOW (MainWindow), GTK_WIN_POS_CENTER);
 	// Icone
-	icone = gtk_window_set_icon_from_file(GTK_WINDOW(MainWindow), "icone.png", NULL);
+	icone = gtk_window_set_icon_from_file(GTK_WINDOW(MainWindow), "../src/icone.png", NULL);
 	// Input label
 	lb->InputLabel = gtk_label_new("Input file");
 	// Button file
@@ -153,8 +154,8 @@ int main(int argc, char **argv)
 	gtk_entry_set_visibility (GTK_ENTRY(Wd->OutputWidget), TRUE);
 	g_signal_connect (Wd->OutputWidget, "activate", G_CALLBACK (enter_callback),Wd->OutputWidget);
 	
-	play = gtk_image_new_from_file ("rsz_play.jpg");
-	pause = gtk_image_new_from_file ("rsz_pause.jpg");
+	play = gtk_image_new_from_file ("../src/rsz_play.jpg");
+	pause = gtk_image_new_from_file ("../src/rsz_pause.jpg");
 	//gtk_image_set_pixel_size (GTK_IMAGE(play), 10);
     //gtk_image_set_pixel_size (GTK_IMAGE(pause), 10);       
 	
@@ -224,6 +225,7 @@ int main(int argc, char **argv)
 	g_signal_connect(G_OBJECT(Wd->AreaWidget), "value-changed", G_CALLBACK (get_area), NULL);
 	g_signal_connect(G_OBJECT(Wd->VolumeWidget), "value-changed", G_CALLBACK (get_volume), NULL);
 
+  g_signal_connect(G_OBJECT(Wd->button_file), "file-set", G_CALLBACK(file_selected_callback), NULL);
 	gtk_container_set_border_width (GTK_CONTAINER(MainWindow), 20);
 
 	// add table in Window
@@ -302,8 +304,5 @@ int main(int argc, char **argv)
 	/* Display and event loops */
 	printf("\n-------\nWindow\n------- \n \nTitle: %s \nSize: %d x %d \nPosition: %dy %dx\n ", sTitle, sLargeur, sHauteur, sPosition_y, sPosition_x);
 
-	gtk_widget_show_all(MainWindow);
-	gtk_main();
-
-	return EXIT_SUCCESS;
+	//return EXIT_SUCCESS;
 }

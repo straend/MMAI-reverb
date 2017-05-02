@@ -12,6 +12,8 @@
     #include "functions.h"
     #include "delay_stuff.h"
 
+#include "GUI.h"
+
 typedef struct {
     uint32_t c_sample;
     sf_count_t samples;
@@ -67,7 +69,85 @@ static void streamFinished( void* userData )
     printf( "Stream Completed\n");
     keep_playing = false;
 }
+char    *infilename=NULL, *outfilename=NULL;
+SNDFILE   *outfile  = NULL;
+SNDFILE   *infile   = NULL ;
+SF_INFO   sfinfo, sfinfo_out;
+
+const PaDeviceInfo *deviceInfo;
+PaStreamParameters outputParameters;
+PaStream *stream;
+PaError err;
+paTestData data = {0};
 reverb_settings_s rs;
+
+void file_selected(char *fname)
+{
+  if ((infile = sf_open (fname, SFM_READ, &sfinfo)) == NULL) {
+    printf("Could not open '%s' for reading: %s\n", fname, sf_strerror(NULL));
+    return ;
+  };
+
+  outputParameters.channelCount = sfinfo.channels;
+  outputParameters.sampleFormat = paFloat32;
+  outputParameters.suggestedLatency = deviceInfo->defaultLowOutputLatency;
+  outputParameters.device = Pa_GetDefaultOutputDevice();
+  outputParameters.hostApiSpecificStreamInfo = NULL;
+
+
+  printf("SampleRate: %d\n", sfinfo.samplerate);
+  printf("Samples   : %lld\n", sfinfo.frames);
+
+  // Read samples to array
+  samples = malloc(sizeof(float) *  sfinfo.frames * sfinfo.channels);
+  sf_readf_float(infile, samples, sfinfo.frames);
+  sf_close (infile);
+  data.samples = sfinfo.frames*sfinfo.channels;
+  data.channels = sfinfo.channels;
+  data.buffer = samples;
+
+  init_moorer(samples, &sfinfo, FRAMES_PER_BUFFER, &rs);
+}
+
+void start_playback(void)
+{
+
+  err = Pa_OpenStream(
+      &stream,
+      NULL,
+      &outputParameters,
+      sfinfo.samplerate,
+      FRAMES_PER_BUFFER,
+      paClipOff,
+      paCallback,
+      &data
+  );
+
+  if( err != paNoError){
+    printf("PortAudio Error %d: %s\n", err, Pa_GetErrorText(err));
+    Pa_Terminate();
+    free(samples);
+    return;
+  }
+
+  err = Pa_SetStreamFinishedCallback( stream, streamFinished );
+  err = Pa_StartStream( stream );
+}
+
+void pause_playback(bool is_paused)
+{
+  if(is_paused){
+    err = Pa_StartStream( stream );
+  } else {
+    Pa_StopStream(stream);
+  }
+}
+
+void stop_playback(void)
+{
+  err = Pa_StopStream( stream );
+  err = Pa_CloseStream( stream );
+}
 void print_usage(char *cmd_name)
 {
     const char *help="\
@@ -117,7 +197,13 @@ void parse_settings(reverb_settings_s *rs, int argc, char *argv[])
       /* High cut: Emulates the effect of high frequencies being absorbed */
     };
     enum ARG_STATE c_state=ARG_WAIT;
-    float wet=0.7,reflect=0.7,damping=1.0,area=20, volume=40, rt60=3.5;
+  rs->rt60 = 3.5;
+  rs->wetmix = 0.7;
+  rs->reflect = 0.7;
+  rs->lateRD = 0.7;
+  rs->earlyRD = 0.7;
+  rs->area = 20;
+  rs->volume = 40;
 
     bool has_rt60 = false;
     bool has_volume_or_area = false;
@@ -184,7 +270,7 @@ void parse_settings(reverb_settings_s *rs, int argc, char *argv[])
     rs->reflect = 0.01;
 
   if(!has_rt60 && has_volume_or_area){
-    rs->rt60 = get_rt60_from_volume_area(volume, area);
+    rs->rt60 = get_rt60_from_volume_area(rs->volume, rs->area);
   }
   rs->earlyRD = rs->reflect;
   rs->lateRD = rs->reflect;
@@ -192,20 +278,11 @@ void parse_settings(reverb_settings_s *rs, int argc, char *argv[])
 
 int main (int argc, char *argv[])
 {
-    char    *infilename=NULL, *outfilename=NULL;
-    float mix=0, earlyRD=0, lateRD=0;/* max mix is 1, max earlyRD is 1, init values of delay are maximum */
-    SNDFILE   *outfile  = NULL;
-    SNDFILE   *infile   = NULL ;
-    SF_INFO   sfinfo, sfinfo_out;
 
-    PaStreamParameters outputParameters;
-    PaStream *stream;
-    PaError err;
-    paTestData data = {0};
     uint32_t i;
 
-
     parse_settings(&rs, argc, argv);
+    printf("rt60:\t %f \nearlyRD:\t %f \nlateRD:\t %f \n", rs.rt60, rs.earlyRD, rs.lateRD);
     // initialize portaudio
     if ((err = Pa_Initialize()) != paNoError){
         printf("portaudio error %d: %s\n", err, Pa_GetErrorText(err));
@@ -218,154 +295,24 @@ int main (int argc, char *argv[])
         Pa_Terminate();
         return 1;
     }
-    const PaDeviceInfo *deviceInfo;
     deviceInfo = Pa_GetDeviceInfo(outputParameters.device);
 
-    if (argc<2){
-        print_usage(argv[0]);
-        Pa_Terminate();
-        return 1;
-    }
+
     printf( "Device: %s\n", deviceInfo->name );
-
-    enum ARG_STATE {
-        ARG_WAIT,
-        ARG_WET_SIGNAL,
-        ARG_SIZE,
-        ARG_OUTFILE,
-        ARG_AREA,
-        ARG_VOLUME,
-        ARG_RT60,
-        ARG_DAMPING /* The dampening will make the "wet" sound of reverb less apparent */
-        /* High cut: Emulates the effect of high frequencies being absorbed */
-    };
-    enum ARG_STATE c_state=ARG_WAIT;
-    float wet=0.7,reflect=0.7,damping=1.0,area=20, volume=40, rt60=3.5;
-    infilename=argv[1];
-
-    bool has_rt60 = false;
-    bool has_volume_or_area = false;
-    for(uint8_t i=2;i<argc; i++){
-        if(strncmp("--",argv[i], 2)==0){
-            char *c = argv[i];
-            c++;c++;
-            if(strncmp("wet", c, 3)==0){
-                c_state =ARG_WET_SIGNAL;
-
-            } else if (strncmp("reflect", c, 7)==0){
-                c_state = ARG_SIZE;
-
-            } else if (strncmp("rt60", c, 4)==0){
-                c_state = ARG_RT60;
-
-            } else if (strncmp("out", c, 3)==0){
-                c_state = ARG_OUTFILE;
-
-            } else if (strncmp("area", c, 4)==0){
-                c_state = ARG_AREA;
-
-            }  else if (strncmp("volume", c, 6)==0){
-                c_state = ARG_VOLUME;
-
-            } else if (strncmp("rt", c, 2)==0){
-                //real_time = true;
-
-            } else if (strncmp("damping", c, 7)==0){
-                c_state = ARG_DAMPING;
-            }
-
-        } else {
-            switch (c_state) {
-                case ARG_WET_SIGNAL:
-                  wet = atof(argv[i]);
-                  break;
-              case ARG_SIZE:
-                  reflect = atof(argv[i]);
-                  break;
-              case ARG_AREA:
-                  area = atof(argv[i]);
-                  has_volume_or_area = true;
-                  break;
-              case ARG_VOLUME:
-                  volume = atof(argv[i]);
-                  has_volume_or_area = true;
-                  break;
-              case ARG_DAMPING:
-                  damping = 1/atof(argv[i]);
-                  break;
-              case ARG_RT60:
-                  rt60 = atof(argv[i]);
-                  has_rt60 = true;
-                  break;
-
-              case ARG_OUTFILE:
-                outfilename = argv[i];
-                break;
-            default:
-                break;
-            }
-        }
-    }
-
-    if(reflect==0.0)
-      reflect = 0.01;
-
-    if(!has_rt60 && has_volume_or_area){
-        rt60 = get_rt60_from_volume_area(volume, area);
-    }
-    earlyRD = reflect;
-    lateRD = reflect;
-
     memset (&sfinfo, 0, sizeof (sfinfo)) ;
+  /* Initialisation of GTK+ */
+    gtk_init(&argc, &argv);
+    /* Creation of the window */
+    GtkWidget * MainWindow = NULL;
+    MainWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
-    if ((infile = sf_open (infilename, SFM_READ, &sfinfo)) == NULL) {
-        printf("Could not open '%s' for reading: %s\n", infilename, sf_strerror(NULL));
-        return 1 ;
-    };
-
-
-    // Read samples to array
-    samples = malloc(sizeof(float) *  sfinfo.frames * sfinfo.channels);
-    sf_readf_float(infile, samples, sfinfo.frames);
-    sf_close (infile);
-    data.samples = sfinfo.frames*sfinfo.channels;
-    data.channels = sfinfo.channels;
-    data.buffer = samples;
-    //try_moorer(samples, &sfinfo, wet, earlyRD, lateRD, rt60, damping);
-
-    init_moorer(samples, &sfinfo, FRAMES_PER_BUFFER, &rs);
-    // Play audio
-    outputParameters.channelCount = sfinfo.channels;
-    outputParameters.sampleFormat = paFloat32;
-    outputParameters.suggestedLatency = deviceInfo->defaultLowOutputLatency;
-    outputParameters.device = Pa_GetDefaultOutputDevice();
-    outputParameters.hostApiSpecificStreamInfo = NULL;
+    init_gui(MainWindow);
 
 
-    printf("SampleRate: %d\n", sfinfo.samplerate);
-    printf("Samples   : %lld\n", sfinfo.frames);
+    gtk_widget_show_all(MainWindow);
+    gtk_main();
 
-    err = Pa_OpenStream(
-        &stream,
-        NULL,
-        &outputParameters,
-        sfinfo.samplerate,
-        FRAMES_PER_BUFFER,
-        paClipOff,
-        paCallback,
-        &data
-    );
-
-    if( err != paNoError){
-        printf("PortAudio Error %d: %s\n", err, Pa_GetErrorText(err));
-        Pa_Terminate();
-        free(samples);
-        return 1;
-    }
-
-    err = Pa_SetStreamFinishedCallback( stream, streamFinished );
-    err = Pa_StartStream( stream );
-
+  /*
     // Wait until we have played all samples
     keep_playing = true;
     bool changed = false;
@@ -397,10 +344,9 @@ int main (int argc, char *argv[])
     sf_writef_float(outfile, samples, sfinfo_out.frames);
     sf_close(outfile);
   }
+*/
 
 
-  err = Pa_StopStream( stream );
-  err = Pa_CloseStream( stream );
   Pa_Terminate();
   finnish_moorer();
 

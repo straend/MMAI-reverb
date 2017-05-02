@@ -15,10 +15,7 @@ include_directories(${GTK3_INCLUDE_DIRS})
 link_directories(${GTK3_LIBRARY_DIRS})
 add_definitions(${GTK3_CFLAGS_OTHER})
 
-set(SOURCE_FILES src/main.c src/reverb_fake.c src/reverb_fake.h src/delay_stuff.c src/delay_stuff.h)
+set(SOURCE_FILES src/main.c src/reverb_fake.c src/reverb_fake.h src/delay_stuff.c src/delay_stuff.h src/main.h src/GUI.c)
 add_executable(mmai ${SOURCE_FILES})
 
-add_executable(GUI src/GUI.c)
-target_link_libraries(GUI ${GTK3_LIBRARIES})
-
-target_link_libraries(mmai sndfile portaudio m)
+target_link_libraries(mmai sndfile portaudio m ${GTK3_LIBRARIES})

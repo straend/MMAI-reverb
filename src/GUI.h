@@ -7,7 +7,7 @@
 
 #include <stdlib.h>
 #include <gtk/gtk.h>
-
+#include "main.h"
 
 gdouble get_wet (GtkRange *range, gpointer  user_data);
 
@@ -26,6 +26,7 @@ gboolean pause_button (GtkWidget *widget, gpointer user_data);
 
 const gchar * enter_callback( GtkWidget *widget, GtkWidget *entry );
 
+void init_gui(GtkWidget *MainWindow);
 
 
 #endif //GUI_H
