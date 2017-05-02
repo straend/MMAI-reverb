@@ -12,11 +12,11 @@
 
 //extern float sample_rate = 44.1f;
 //extern float decay = 0.5f;
-//extern double buffer[];
+//extern float buffer[];
 
-//void delay_line(double *buffer);
+//void delay_line(float *buffer);
 
-void reverb_time(double *samples, SF_INFO *sfInfo);
+void reverb_time(float *samples, SF_INFO *sfInfo);
 
 
 #endif // FUNCTIONS_H

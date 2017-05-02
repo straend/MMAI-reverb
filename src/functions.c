@@ -15,21 +15,21 @@
 //#define B0 		1 //other constant value
 //#define AM		1 //other constant value
 
-double b0;
-double am;
-//static double D[M]; /* initialized to zero */
-static double *D;					// table which contains values of the input sound
+float b0;
+float am;
+//static float D[M]; /* initialized to zero */
+static float *D;					// table which contains values of the input sound
 static long ptr=0;  /* read-write offset */
 uint32_t M;
 
 // Combfilters
-static double *paramB0; //[] = {123, 523, 345, 222, 164,253}; //values of b0 for different comb filters
-static double *paramAm; //[] = {0.6, 0.7, 0.3, 0.5, 0.2, 0.3}; //values of Am for different comb filters
+static float *paramB0; //[] = {123, 523, 345, 222, 164,253}; //values of b0 for different comb filters
+static float *paramAm; //[] = {0.6, 0.7, 0.3, 0.5, 0.2, 0.3}; //values of Am for different comb filters
 
 // function of a delay line
-double delayline(double x)
+float delayline(float x)
 {
-  double y = D[ptr]; /* read operation */
+  float y = D[ptr]; /* read operation */
   D[ptr++] = x;      /* write operation */
   if (ptr >= M) { 
 	ptr -= M; 
@@ -39,15 +39,15 @@ double delayline(double x)
 
 // function of an allpass filter 
 // found from a transfer function
-double allpass_filter(double input, double b0, double am){
-	double tmp = delayline(input);
+float allpass_filter(float input, float b0, float am){
+	float tmp = delayline(input);
 	return (b0 + tmp) / (1 + am*tmp);
 }
 
- double get_gain(double t, double RVT);
+ float get_gain(float t, float RVT);
 
 // g = 0.001 ^(tau / RVT)
- double get_gain(double t, double RVT)
+ float get_gain(float t, float RVT)
 {
     return pow(0.001, t/RVT);
 }
@@ -56,15 +56,15 @@ double allpass_filter(double input, double b0, double am){
 // found from a transfer function
 // Different comb filters will have to be used 
 // The variation should be the constant values b0 and Am?
-double feedback_comb_filter(double input, double b0, double am){
-	double tmp = delayline(input);
+float feedback_comb_filter(float input, float b0, float am){
+	float tmp = delayline(input);
 	return b0/(1+am*tmp);
 }
 
 
-double sum_comb_filters(double input, double *paramB0, double *paramAm){
+float sum_comb_filters(float input, float *paramB0, float *paramAm){
 	// initialisation
-	double sum = 0;
+	float sum = 0;
 
     for (int i = 0; i < 1; i++) {
 		sum += feedback_comb_filter(input, paramB0[i], paramAm[i]);
@@ -72,7 +72,7 @@ double sum_comb_filters(double input, double *paramB0, double *paramAm){
 	return sum;
 }
 
-double late_reflections_network(double input){
+float late_reflections_network(float input){
 
     //return allpass_filter(input, b0, am);
     return sum_comb_filters(input, paramB0, paramAm);
@@ -85,10 +85,10 @@ double late_reflections_network(double input){
     );
 }
 
-void reverb_time(double *samples, SF_INFO *sfInfo)
+void reverb_time(float *samples, SF_INFO *sfInfo)
 {
-    double rvt[] = {1.1, 1.5, 1.8, 1.2};
-    double tau[] = {0.0297, 0.0371, 0.0411,0.0437};
+    float rvt[] = {1.1, 1.5, 1.8, 1.2};
+    float tau[] = {0.0297, 0.0371, 0.0411,0.0437};
 
     uint32_t  filters=sizeof(rvt)/ sizeof(rvt[0]);
     paramB0 = calloc(sizeof(rvt[0]), filters);
@@ -109,8 +109,8 @@ void reverb_time(double *samples, SF_INFO *sfInfo)
     b0 = 0.09683;
     D = samples;
     M = sfInfo->frames*sfInfo->channels;
-    double *d = calloc(sizeof(double), M);
-    memcpy(d, D, M* sizeof(double));
+    float *d = calloc(sizeof(float), M);
+    memcpy(d, D, M* sizeof(float));
     for (uint32_t i=0; i<M; i++){
         samples[i] += late_reflections_network(samples[i]);
     }
@@ -126,14 +126,14 @@ void reverb_time(double *samples, SF_INFO *sfInfo)
 // produce 	a reverb effect in an existing array
 // delay_line
 /*
-void delay_line(double *buffer){
+void delay_line(float *buffer){
 	int delayMilliseconds = 500; // half a second
 	int delaySamples = (int)((float)delayMilliseconds * sample_rate); // assumes 44100 Hz sample rate
 	int i;
 	for (i = 0; i < buffer.length - delaySamples; i++)
 	{
 		// WARNING: overflow potential
-		buffer[i + delaySamples] += (double)((float)buffer[i] * decay);
+		buffer[i + delaySamples] += (float)((float)buffer[i] * decay);
 	}
 }
 */
