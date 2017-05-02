@@ -9,22 +9,22 @@
 #include <gtk/gtk.h>
 
 
-GtkRange * get_wet (GtkRange *range, gpointer  user_data);
+gdouble get_wet (GtkRange *range, gpointer  user_data);
 
-GtkRange * get_reflection (GtkRange *range, gpointer  user_data);
+gdouble get_reflection (GtkRange *range, gpointer  user_data);
 
-GtkRange * get_damping (GtkRange *range, gpointer  user_data);
+gdouble get_damping (GtkRange *range, gpointer  user_data);
 
-GtkRange * get_rt60 (GtkRange *range, gpointer  user_data);
+gdouble get_rt60 (GtkRange *range, gpointer  user_data);
 
-GtkRange * get_area (GtkRange *range, gpointer  user_data);
+gdouble get_area (GtkRange *range, gpointer  user_data);
 
-GtkRange * get_volume (GtkRange *range, gpointer  user_data);
+gdouble get_volume (GtkRange *range, gpointer  user_data);
 
 gboolean play_button (GtkWidget *widget, gpointer user_data);
 gboolean pause_button (GtkWidget *widget, gpointer user_data);
 
-static void enter_callback( GtkWidget *widget, GtkWidget *entry );
+const gchar * enter_callback( GtkWidget *widget, GtkWidget *entry );
 
 
 

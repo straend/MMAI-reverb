@@ -33,46 +33,46 @@ typedef struct _Widget {
 	GtkWidget *PauseButton;
 } Widget;
 
-GtkRange * get_wet (GtkRange *range,
+gdouble get_wet (GtkRange *range,
                gpointer  user_data)
 {
     printf("Wet -> %f\n", gtk_range_get_value(range));
-    return range;
+    return gtk_range_get_value(range);
 }
 
-GtkRange * get_reflection (GtkRange *range,
+gdouble get_reflection (GtkRange *range,
                gpointer  user_data)
 {
     printf("Reflection -> %f\n", gtk_range_get_value(range));
-    return range;
+    return gtk_range_get_value(range);
 }
 
-GtkRange * get_damping (GtkRange *range,
+gdouble get_damping (GtkRange *range,
                gpointer  user_data)
 {
     printf("Damping -> %f\n", gtk_range_get_value(range));
-    return range;
+    return gtk_range_get_value(range);
 }
 
-GtkRange * get_rt60 (GtkRange *range,
+gdouble get_rt60 (GtkRange *range,
                gpointer  user_data)
 {
     printf("Rt60 -> %f\n", gtk_range_get_value(range));
-    return range;
+    return gtk_range_get_value(range);
 }
 
-GtkRange * get_area (GtkRange *range,
+gdouble get_area (GtkRange *range,
                gpointer  user_data)
 {
     printf("Area -> %f\n", gtk_range_get_value(range));
-    return range;
+    return gtk_range_get_value(range);
 }
 
-GtkRange * get_volume (GtkRange *range,
+gdouble get_volume (GtkRange *range,
                gpointer  user_data)
 {
     printf("Volume -> %f\n", gtk_range_get_value(range));
-    return range;
+    return gtk_range_get_value(range);
 }
 
 gboolean play_button (GtkWidget *widget, gpointer user_data)
@@ -91,12 +91,13 @@ gboolean pause_button (GtkWidget *widget, gpointer user_data)
     return bpause;
 }
 
-static void enter_callback( GtkWidget *widget, GtkWidget *entry )
+const gchar * enter_callback( GtkWidget *widget, GtkWidget *entry )
 {
   const gchar *entry_text;
   entry_text = gtk_entry_get_text (GTK_ENTRY (entry));
   printf ("New file name entered: %s\n", entry_text);
   //entry_text countains the new file name
+  return entry_text;
 }
 
 
