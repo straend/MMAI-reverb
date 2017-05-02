@@ -4,8 +4,7 @@
  * Build: gcc `pkg-config --cflags gtk+-3.0` -o GUI GUI.c `pkg-config --libs gtk+-3.0`
  */
 
-#include <stdlib.h>
-#include <gtk/gtk.h>
+#include "GUI.h"
 
 typedef struct _Label {
 	GtkWidget *InputLabel;
@@ -34,22 +33,25 @@ typedef struct _Widget {
 	GtkWidget *PauseButton;
 } Widget;
 
-void get_wet (GtkRange *range,
+GtkRange * get_wet (GtkRange *range,
                gpointer  user_data)
 {
     printf("Wet -> %f\n", gtk_range_get_value(range));
+    return range;
 }
 
-void get_reflection (GtkRange *range,
+GtkRange * get_reflection (GtkRange *range,
                gpointer  user_data)
 {
     printf("Reflection -> %f\n", gtk_range_get_value(range));
+    return range;
 }
 
-void get_damping (GtkRange *range,
+GtkRange * get_damping (GtkRange *range,
                gpointer  user_data)
 {
     printf("Damping -> %f\n", gtk_range_get_value(range));
+    return range;
 }
 
 GtkRange * get_rt60 (GtkRange *range,
@@ -59,16 +61,25 @@ GtkRange * get_rt60 (GtkRange *range,
     return range;
 }
 
-void get_area (GtkRange *range,
+GtkRange * get_area (GtkRange *range,
                gpointer  user_data)
 {
     printf("Area -> %f\n", gtk_range_get_value(range));
+    return range;
 }
 
-void get_volume (GtkRange *range,
+GtkRange * get_volume (GtkRange *range,
                gpointer  user_data)
 {
     printf("Volume -> %f\n", gtk_range_get_value(range));
+    return range;
+}
+
+gboolean get_pressed_play (GtkWidget *widget, GdkEvent  *event,
+							gpointer   user_data)
+{
+
+
 }
 
 static void enter_callback( GtkWidget *widget, GtkWidget *entry )
