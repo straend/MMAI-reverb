@@ -221,16 +221,7 @@ int main (int argc, char *argv[])
       reflect = 0.01;
 
     if(!has_rt60 && has_volume_or_area){
-      /*
-       * RT = 0.16 x V / A
-       * T = reverberation time, s
-       * V = volume of the room, m3
-       * A = (Σ surface area (S) x α) = absorption area of the room, m2
-       * For a frequency of 100Hz and 4mm glass as materia matCoef = 0.07
-       */
-        float matCoef = 0.07;
-        float A = area*matCoef;
-        rt60 = 0.16*volume/A;
+        rt60 = get_rt60_from_volume_area(volume, area);
     }
     earlyRD = reflect;
     lateRD = reflect;

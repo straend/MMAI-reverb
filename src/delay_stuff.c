@@ -285,3 +285,16 @@ void print_stuff(float *one, float *two, uint32_t start, uint32_t samples)
   }
 
 }
+
+/*
+   * RT = 0.16 x V / A
+   * T = reverberation time, s
+   * V = volume of the room, m3
+   * A = (Σ surface area (S) x α) = absorption area of the room, m2
+   * For a frequency of 100Hz and 4mm glass as materia matCoef = 0.07
+*/
+float get_rt60_from_volume_area(float volume, float area) {
+    float matCoef = 0.07;
+    float A = area * matCoef;
+    return 0.16 * volume / A;
+}

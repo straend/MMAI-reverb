@@ -57,7 +57,7 @@ void set_earlyRD(float earlyRD);
 void set_damping(float damping);
 void set_cutoff(float cutoff);
 
-
+float get_rt60_from_volume_area(float volume, float area);
 
 
 
