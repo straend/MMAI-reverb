@@ -231,17 +231,16 @@ float *late_reflections;
 float _mixWet;
 
 void init_moorer(float *samples, SF_INFO *sfinfo, const uint32_t iter,
-                 float mixWet, float earlyRD, float lateRD,
-                 float rt60, float damping
+                 reverb_settings_s *rs
 )
 {
-  init_early(samples, sfinfo, earlyRD);
-  init_combs(samples, sfinfo, rt60, damping);
-  init_allpass(samples, sfinfo, lateRD);
+  init_early(samples, sfinfo, rs->earlyRD);
+  init_combs(samples, sfinfo, rs->rt60, rs->damping);
+  init_allpass(samples, sfinfo, rs->lateRD);
 
   early_reflections=calloc(sizeof(float), iter*sfinfo->channels);
   late_reflections=calloc(sizeof(float), iter*sfinfo->channels);
-  _mixWet = mixWet;
+  _mixWet = rs->wetmix;
 }
 
 void process_moorer(const uint32_t iter, float *samples)

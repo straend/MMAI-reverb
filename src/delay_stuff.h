@@ -18,7 +18,7 @@ typedef struct{
     float *input;
     float delay_ms;
     uint64_t delay_samples;
-	uint64_t samplerate;
+	  uint64_t samplerate;
     uint64_t ptr;
     SF_INFO *sf;
     float *delay;
@@ -28,6 +28,21 @@ typedef struct{
     float lp_last;
 
 } delay_line_s;
+
+typedef struct{
+  float rt60;
+  float damping;
+  float reflect; // early and late RD
+  float earlyRD;
+  float lateRD;
+  float wetmix;
+  float cutoff;
+
+  float volume;
+  float area;
+
+} reverb_settings_s;
+
 void init_delay(delay_line_s *dl, float delay_ms,
 				float *input, SF_INFO *sf, float gain
 );
@@ -45,8 +60,7 @@ void try_moorer(float *samples, SF_INFO *sfinfo, float mix,
 );
 
 void init_moorer(float *samples, SF_INFO *sfinfo, const uint32_t iter,
-				 float mixWet, float earlyRD, float lateRD,
-				 float rt60, float damping
+				 reverb_settings_s *rs
 );
 
 void process_moorer(const uint32_t iter, float *samples);

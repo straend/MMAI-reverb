@@ -67,6 +67,7 @@ static void streamFinished( void* userData )
     printf( "Stream Completed\n");
     keep_playing = false;
 }
+reverb_settings_s rs;
 void print_usage(char *cmd_name)
 {
     const char *help="\
@@ -101,6 +102,94 @@ void print_usage(char *cmd_name)
     \n\n";
     printf(help, cmd_name);
 }
+
+void parse_settings(reverb_settings_s *rs, int argc, char *argv[])
+{
+    enum ARG_STATE {
+      ARG_WAIT,
+      ARG_WET_SIGNAL,
+      ARG_SIZE,
+      ARG_OUTFILE,
+      ARG_AREA,
+      ARG_VOLUME,
+      ARG_RT60,
+      ARG_DAMPING /* The dampening will make the "wet" sound of reverb less apparent */
+      /* High cut: Emulates the effect of high frequencies being absorbed */
+    };
+    enum ARG_STATE c_state=ARG_WAIT;
+    float wet=0.7,reflect=0.7,damping=1.0,area=20, volume=40, rt60=3.5;
+
+    bool has_rt60 = false;
+    bool has_volume_or_area = false;
+    for(uint8_t i=2;i<argc; i++){
+    if(strncmp("--",argv[i], 2)==0){
+      char *c = argv[i];
+      c++;c++;
+      if(strncmp("wet", c, 3)==0){
+        c_state =ARG_WET_SIGNAL;
+
+      } else if (strncmp("reflect", c, 7)==0){
+        c_state = ARG_SIZE;
+
+      } else if (strncmp("rt60", c, 4)==0){
+        c_state = ARG_RT60;
+
+      } else if (strncmp("out", c, 3)==0){
+        c_state = ARG_OUTFILE;
+
+      } else if (strncmp("area", c, 4)==0){
+        c_state = ARG_AREA;
+
+      }  else if (strncmp("volume", c, 6)==0){
+        c_state = ARG_VOLUME;
+
+      } else if (strncmp("damping", c, 7)==0){
+        c_state = ARG_DAMPING;
+      }
+
+    } else {
+      switch (c_state) {
+      case ARG_WET_SIGNAL:
+          rs->wetmix = atof(argv[i]);
+          break;
+      case ARG_SIZE:
+        rs->reflect = atof(argv[i]);
+        break;
+      case ARG_AREA:
+        rs->area = atof(argv[i]);
+        has_volume_or_area = true;
+        break;
+      case ARG_VOLUME:
+        rs->volume = atof(argv[i]);
+        has_volume_or_area = true;
+        break;
+      case ARG_DAMPING:
+        rs->damping = 1/atof(argv[i]);
+        break;
+      case ARG_RT60:
+        rs->rt60 = atof(argv[i]);
+        has_rt60 = true;
+        break;
+
+      case ARG_OUTFILE:
+        outfilename = argv[i];
+        break;
+      default:
+      break;
+      }
+    }
+  }
+
+  if(rs->reflect==0.0)
+    rs->reflect = 0.01;
+
+  if(!has_rt60 && has_volume_or_area){
+    rs->rt60 = get_rt60_from_volume_area(volume, area);
+  }
+  rs->earlyRD = rs->reflect;
+  rs->lateRD = rs->reflect;
+}
+
 int main (int argc, char *argv[])
 {
     char    *infilename=NULL, *outfilename=NULL;
@@ -116,6 +205,7 @@ int main (int argc, char *argv[])
     uint32_t i;
 
 
+    parse_settings(&rs, argc, argv);
     // initialize portaudio
     if ((err = Pa_Initialize()) != paNoError){
         printf("portaudio error %d: %s\n", err, Pa_GetErrorText(err));
@@ -242,8 +332,8 @@ int main (int argc, char *argv[])
     data.channels = sfinfo.channels;
     data.buffer = samples;
     //try_moorer(samples, &sfinfo, wet, earlyRD, lateRD, rt60, damping);
-    init_moorer(samples, &sfinfo, FRAMES_PER_BUFFER, wet, earlyRD, lateRD, rt60, damping);
 
+    init_moorer(samples, &sfinfo, FRAMES_PER_BUFFER, &rs);
     // Play audio
     outputParameters.channelCount = sfinfo.channels;
     outputParameters.sampleFormat = paFloat32;
