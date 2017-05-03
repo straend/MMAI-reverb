@@ -211,7 +211,8 @@ void parse_settings(reverb_settings_s *rs, int argc, char *argv[])
 
     bool has_rt60 = false;
     bool has_volume_or_area = false;
-    for(uint8_t i=2;i<argc; i++){
+    uint8_t i;
+    for(i=2;i<argc; i++){
     if(strncmp("--",argv[i], 2)==0){
       char *c = argv[i];
       c++;c++;
