@@ -10,7 +10,7 @@ script:
   - cmake .. && make
 
 compiler:
-  - gcc
+#  - gcc
   - clang
 
 install:
@@ -18,3 +18,15 @@ install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install portaudio libsndfile gtk+3 ; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update -qq ; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libsndfile1-dev libportaudio2 portaudio19-dev libgtk-3-dev; fi
+
+before_deploy:
+  - "mv build/mmai build/mmai-$TRAVIS_TAG-$TRAVIS_OS_NAME"
+
+deploy:
+  provider: releases
+  api_key:
+    secure: "TQCU/XgLukkTDgZM4Vx1BNoSqIjPJNLrWEoRhLxMExr0Z7OGFHSzxwpS0daRsW1RprZeKAqbEPdhU+pMy0j58FGSDI6xbSFGN3hrdUz5DHvj5P8TIC0QBv7Xt0RovcduH7Tl4w8kHkA6CIykNwrH2jiSyZIjq6kg5htmefnXAWoymoht20P583CKS3i+7EADDFWb6NcX7D3swnYBgQFrl8DL3uaTpfpFYfU+95psMlrIaVAHvhuRlxm21diu5myLMPUccW4vFk1SLL0uveFtckatpFnCLau5IJa6d/bXZ+fSz6YazfMDbiVFYI3/f/ffzHiIFe6TTVizUuN/vFq3ecnTAFkEg7ZMlgviErojxCRrb6sSmvYnvqi97KelB4p2OeI2E7wrOHoHK6Dl7PBbGkSx6LL2XE8SPRQPiFqLkh6VAFnd+APKI9F5iomJmO9PpZy9rCRzW5kmDV61dOWObTywYyfhEHXFzlnUGjzkK82LERoj6nBRWsLDSnA2z+GYYzTulmHNV2F5ZcIfwJ96xtn57jQLirlhE8fXrHnMZX0eiIYqmLreva0pr6rZvDm7jVRs10G1NBHxyZEXvABVa30w7nFrqLDpmowyKX25VNBmvTrnlZMR0PLsCI6JTNs8eEZymz7XDEVR/Ek7nSNYI1c56l4h5CeobiL0yCcaijA="
+  skip_cleanup: true
+  file: "build/mmai-$TRAVIS_TAG-$TRAVIS_OS_NAME"
+  on:
+    tags: true
