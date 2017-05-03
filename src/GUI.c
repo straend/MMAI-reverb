@@ -33,10 +33,13 @@ typedef struct _Widget {
 	GtkWidget *PauseButton;
 } Widget;
 
+reverb_settings_s rs;
+
 gdouble get_wet (GtkRange *range,
                gpointer  user_data)
 {
     printf("Wet -> %f\n", gtk_range_get_value(range));
+    set_earlyRD(gtk_range_get_value(range));
     return gtk_range_get_value(range);
 }
 
@@ -44,6 +47,7 @@ gdouble get_reflection (GtkRange *range,
                gpointer  user_data)
 {
     printf("Reflection -> %f\n", gtk_range_get_value(range));
+    set_cutoff(gtk_range_get_value(range));
     return gtk_range_get_value(range);
 }
 
@@ -51,6 +55,7 @@ gdouble get_damping (GtkRange *range,
                gpointer  user_data)
 {
     printf("Damping -> %f\n", gtk_range_get_value(range));
+    set_damping(gtk_range_get_value(range));
     return gtk_range_get_value(range);
 }
 
@@ -58,6 +63,7 @@ gdouble get_rt60 (GtkRange *range,
                gpointer  user_data)
 {
     printf("Rt60 -> %f\n", gtk_range_get_value(range));
+    set_rt60(gtk_range_get_value(range));
     return gtk_range_get_value(range);
 }
 
@@ -208,6 +214,14 @@ void init_gui(GtkWidget *MainWindow)
 	gtk_range_set_inverted(GTK_RANGE(Wd->AreaWidget), TRUE);
 	gtk_range_set_inverted(GTK_RANGE(Wd->VolumeWidget), TRUE);
 
+	// Set default values range
+	gtk_range_set_value (GTK_RANGE(Wd->WetWidget), 0.7);
+	gtk_range_set_value (GTK_RANGE(Wd->ReflectWidget), 0.7);
+	gtk_range_set_value (GTK_RANGE(Wd->DampWidget), 0.7);
+	gtk_range_set_value (GTK_RANGE(Wd->Rt60Widget), 3.5);
+	gtk_range_set_value (GTK_RANGE(Wd->AreaWidget), 0);
+	gtk_range_set_value (GTK_RANGE(Wd->VolumeWidget), 0);
+	
 	// set Entry 
 	//gtk_entry_set_buffer (GTK_ENTRY(Wd->OutputWidget), outputFileName);
 	gtk_entry_set_text (GTK_ENTRY(Wd->OutputWidget), fileEx);
@@ -225,7 +239,7 @@ void init_gui(GtkWidget *MainWindow)
 	g_signal_connect(G_OBJECT(Wd->AreaWidget), "value-changed", G_CALLBACK (get_area), NULL);
 	g_signal_connect(G_OBJECT(Wd->VolumeWidget), "value-changed", G_CALLBACK (get_volume), NULL);
 
-  g_signal_connect(G_OBJECT(Wd->button_file), "file-set", G_CALLBACK(file_selected_callback), NULL);
+	g_signal_connect(G_OBJECT(Wd->button_file), "file-set", G_CALLBACK(file_selected_callback), NULL);
 	gtk_container_set_border_width (GTK_CONTAINER(MainWindow), 20);
 
 	// add table in Window
@@ -287,6 +301,8 @@ void init_gui(GtkWidget *MainWindow)
 	// Column
 	gtk_grid_get_column_homogeneous (GTK_GRID(table));
 	gtk_grid_get_column_spacing (GTK_GRID(table));
+	
+	
 	
 	// Entry out
 	gtk_entry_get_text (GTK_ENTRY(Wd->OutputWidget));
