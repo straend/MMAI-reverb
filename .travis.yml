@@ -8,37 +8,13 @@ os:
 script:
   - cd build
   - cmake .. && make
+
 compiler:
   - gcc
+  - clang
 
-addons:
-  apt:
-    packages:
-      - libsndfile1
-      - libsndfile1-dev
-      - libportaudio2
-      - portaudio19-dev
-
-before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update          ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install portaudio libsndfile; fi
-
-#before_deploy:
-#  - mv mmai mmai-$TRAVIS_OS_NAME
-#  - git config --global user.email "builds@travis-ci.com"
-#  - git config --global user.name "Travis CI"
-#  - export GIT_TAG=$TRAVIS_BUILD_NUMBER
-#  - git add "$FILE_TO_UPLOAD"
-#  - git tag $GIT_TAG -a -m "Generated tag from Travis CI for build $TRAVIS_BUILD_NUMBER"
-#  - git push --tags
-#  - export FILE_TO_UPLOAD=mmai-$TRAVIS_OS_NAME
-#  - echo "Releasing $FILE_TO_UPLOD"
-
-#deploy:
-#  skip_cleanup: true
-#  provider: releases
-#  api_key:
-#    secure: dD7rbK4p+SHOdMzI7oDfO9WM06C6fXlI6s7gnUNOJAwYxZNU8pNITL2I64i522ODkDCTbftdq0Nxhd6SABwHIR9/+NLhNy231C4PMxVEiMUmr/dja9/mJLnvpMg5rLcJfqxOOVLk3l+B1XvUtJ9DnviHU3dhWD8aZXRFviAskEv3C5LuyOJuDB9yiYFQyXqyc+XeYex2rRS1/nao1FzqYMectq+P5AGVMI3jFUvNTnTJpnLWkyOpO/PZt+BC0lnfENu9QbB3nuYa8GJdYDZ0jarSsoCwsmnbeFXK6VCsFN6RQSH1uhujWuAPnm+DMDCmBVfiyK3KBrSs7u3qqE91//tDHzXDIKM/OR45Z8IhIOcpphUKQTf74voeKquaehDY10W3WjBmhMhi3XOIDirvf6vCdErbXDxx+KrhxEHCFD/pqb+25yRkVMg+v8CcksxgVF9Ino+jZ+a3h5CS7zmFqfG/K5Qkw7z5fhN7NXH+KtqsHxeBr86LWm/XEa9sGqwWRWlNjQezLlKmZnXSf48E2u2SDWckyM+Dl2vG932ZOiDWKExhNYZ/+g5jD3cn7CvDoRw0ygTRnfEM87rYqAMFhnrWlgMYB70S5CUjqZavc+iQilxnNZUf/sI3O5XHfAToDD+W6ApreCL04LT7EE4ACWhgqKfo8Gr57wTa/uk8gjQ=
-#  file: "${FILE_TO_UPLOAD}"
-#  on:
-#    repo: straend/MMAI-reverb
+install:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install portaudio libsndfile gtk+3 ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update -qq ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libsndfile1-dev libportaudio2 portaudio19-dev libgtk-3-dev; fi

@@ -47,7 +47,11 @@ gdouble get_reflection (GtkRange *range,
                gpointer  user_data)
 {
     printf("Reflection -> %f\n", gtk_range_get_value(range));
+<<<<<<< HEAD
     set_cutoff(gtk_range_get_value(range));
+=======
+    set_earlyRD(gtk_range_get_value(range));
+>>>>>>> 1b8517172c84fb84af241a768efd808b0943ef50
     return gtk_range_get_value(range);
 }
 
@@ -63,7 +67,11 @@ gdouble get_rt60 (GtkRange *range,
                gpointer  user_data)
 {
     printf("Rt60 -> %f\n", gtk_range_get_value(range));
+<<<<<<< HEAD
     set_rt60(gtk_range_get_value(range));
+=======
+  set_rt60(gtk_range_get_value(range));
+>>>>>>> 1b8517172c84fb84af241a768efd808b0943ef50
     return gtk_range_get_value(range);
 }
 

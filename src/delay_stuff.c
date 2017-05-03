@@ -78,20 +78,23 @@ void set_delay_comb(delay_line_s *dl, float delay_ms, float gain, float cutoff)
 }
 void set_earlyRD(float earlyRD)
 {
-  for(uint8_t d=0;d<TAPS;d++){
+  uint8_t d;
+  for(d=0;d<TAPS;d++){
     set_delay(&dl[d], ER_TAPS[d]*earlyRD, ER_GAINS[d]);
   }
 }
 void set_damping(float damping)
 {
-  for(uint8_t d=0;d<TAPS;d++){
+  uint8_t d;
+  for(d=0;d<TAPS;d++){
     dl[d].gain = ER_GAINS[d]*damping;
   }
 }
 
 void set_cutoff(float cutoff)
 {
-  for(uint8_t d=0;d<TAPS;d++){
+  uint8_t d;
+  for(d=0;d<TAPS;d++){
     float costh = 2.0 - cos(2.0 * M_PI * cutoff / dl[d].sf->samplerate);
     dl[d].lp_coef = sqrt(costh * costh - 1.0) - costh;
   }
@@ -103,7 +106,8 @@ void set_cutoff(float cutoff)
  */
 void set_rt60(float rt60)
 {
-  for (uint8_t c = 0; c < COMBS; c++) {
+  uint8_t c;
+  for (c = 0; c < COMBS; c++) {
     float g = pow(10.0, ((-3.0 * comb_delays[c]) / (rt60 * 1000.0)));
     comb[c].gain = g;
   }
@@ -170,15 +174,16 @@ float process_comb(delay_line_s *dl, float x)
 
 void init_early(float *samples, SF_INFO *sfinfo, float earlyRD)
 {
-  for(uint8_t d=0;d<TAPS;d++){
+  uint8_t d;
+  for(d=0;d<TAPS;d++){
     init_delay(&dl[d], ER_TAPS[d]*earlyRD, samples, sfinfo, ER_GAINS[d]);
   }
 }
 
 void init_combs(float *samples, SF_INFO *sfinfo, float rt60, float damping)
 {
-
-  for (uint8_t c = 0; c < COMBS; c++) {
+  uint8_t c;
+  for (c = 0; c < COMBS; c++) {
     float g = pow(10.0, ((-3.0 * comb_delays[c]) / (rt60 * 1000.0)));
     init_delay_comb(&comb[c], comb_delays[c], samples, sfinfo, g, comb_damp_freq[c]*damping);
   }
@@ -191,11 +196,12 @@ void init_allpass(float *samples, SF_INFO *sfinfo, float lateRD)
 
 void process_early_iter(float *input, const uint32_t iter)
 {
-
-  for (uint32_t i=0; i<iter; i++){
+  uint32_t i;
+  for (i=0; i<iter; i++){
     float x = input[i];
     float processed = 0;
-    for(uint8_t d=0;d<TAPS;d++){
+    uint8_t d;
+    for(d=0;d<TAPS;d++){
       float y = process_delay(&dl[d], x);
       processed += y;
 
@@ -207,10 +213,12 @@ void process_early_iter(float *input, const uint32_t iter)
 }
 void process_comb_iter(float *input, const uint32_t iter)
 {
-  for (uint32_t i=0; i<iter; i++) {
+  uint32_t i;
+  for (i=0; i<iter; i++) {
     float x = input[i];
     float processed = 0;
-    for (uint8_t c = 0; c < COMBS; c++) {
+    uint8_t c;
+    for (c = 0; c < COMBS; c++) {
       processed += process_comb(&comb[c], x);
     }
     input[i] = processed;
@@ -218,7 +226,8 @@ void process_comb_iter(float *input, const uint32_t iter)
 }
 void process_allpass_iter(float *input, const uint32_t iter)
 {
-  for (uint32_t i=0; i<iter; i++) {
+  uint32_t i;
+  for (i=0; i<iter; i++) {
     float processed = 0;
     float x = input[i];
     processed += process_allpass(&dla, x);
@@ -255,7 +264,8 @@ void process_moorer(const uint32_t iter, float *samples)
 
 
   float mixDry=1-_mixWet;
-  for (uint32_t i=0; i<iter; i++) {
+  uint32_t i;
+  for (i=0; i<iter; i++) {
     float or = samples[i];
     float m = or*mixDry + late_reflections[i]*_mixWet;
     samples[i] = m;//early_reflections[i];
@@ -264,11 +274,12 @@ void process_moorer(const uint32_t iter, float *samples)
 
 void finnish_moorer()
 {
-  for(uint8_t d=0;d<TAPS;d++){
+  uint8_t d;
+  for(d=0;d<TAPS;d++){
     free(dl[d].delay);
   }
-  for (uint8_t c = 0; c < COMBS; c++) {
-    free(comb[c].delay);
+  for (d = 0; d < COMBS; d++) {
+    free(comb[d].delay);
   }
   free(dla.delay);
 
@@ -279,7 +290,8 @@ void finnish_moorer()
 void print_stuff(float *one, float *two, uint32_t start, uint32_t samples)
 {
   printf("#####%d####\n", start);
-  for(uint32_t i=start; i<start+samples; i++){
+  uint32_t  i;
+  for(i=start; i<start+samples; i++){
     printf("%f \t %f \n", one[i], two[i]);
   }
 

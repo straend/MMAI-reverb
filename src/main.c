@@ -23,11 +23,10 @@ typedef struct {
 
 float *samples;
 uint32_t  processed=0;
-#define FRAMES_PER_BUFFER (1024)
+#define FRAMES_PER_BUFFER (256)
 volatile bool keep_playing = false;
 
-
-    static int paCallback(
+static int paCallback(
     const void *inputBuffer, void *outputBuffer,
     unsigned long framesPerBuffer,
     const PaStreamCallbackTimeInfo* timeInfo,
@@ -62,14 +61,6 @@ volatile bool keep_playing = false;
     return paContinue;
 }
 
-static void streamFinished( void* userData )
-{
-    paTestData *data = (paTestData *) userData;
-    (void) data;
-    printf( "Stream Completed\n");
-    keep_playing = false;
-}
-char    *infilename=NULL, *outfilename=NULL;
 SNDFILE   *outfile  = NULL;
 SNDFILE   *infile   = NULL ;
 SF_INFO   sfinfo, sfinfo_out;
@@ -80,6 +71,18 @@ PaStream *stream;
 PaError err;
 paTestData data = {0};
 reverb_settings_s rs;
+char    *infilename=NULL, *outfilename=NULL;
+
+static void streamFinished( void* userData )
+{
+  paTestData *data = (paTestData *) userData;
+  (void) data;
+  printf( "Stream Completed\n");
+  keep_playing = false;
+  finnish_moorer();
+  file_selected(infilename);
+
+}
 
 void file_selected(char *fname)
 {
@@ -87,6 +90,7 @@ void file_selected(char *fname)
     printf("Could not open '%s' for reading: %s\n", fname, sf_strerror(NULL));
     return ;
   };
+  infilename = fname;
 
   outputParameters.channelCount = sfinfo.channels;
   outputParameters.sampleFormat = paFloat32;
@@ -207,7 +211,8 @@ void parse_settings(reverb_settings_s *rs, int argc, char *argv[])
 
     bool has_rt60 = false;
     bool has_volume_or_area = false;
-    for(uint8_t i=2;i<argc; i++){
+    uint8_t i;
+    for(i=2;i<argc; i++){
     if(strncmp("--",argv[i], 2)==0){
       char *c = argv[i];
       c++;c++;
