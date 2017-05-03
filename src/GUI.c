@@ -44,6 +44,7 @@ gdouble get_reflection (GtkRange *range,
                gpointer  user_data)
 {
     printf("Reflection -> %f\n", gtk_range_get_value(range));
+    set_earlyRD(gtk_range_get_value(range));
     return gtk_range_get_value(range);
 }
 
@@ -51,6 +52,7 @@ gdouble get_damping (GtkRange *range,
                gpointer  user_data)
 {
     printf("Damping -> %f\n", gtk_range_get_value(range));
+    set_damping(gtk_range_get_value(range));
     return gtk_range_get_value(range);
 }
 
@@ -58,6 +60,7 @@ gdouble get_rt60 (GtkRange *range,
                gpointer  user_data)
 {
     printf("Rt60 -> %f\n", gtk_range_get_value(range));
+  set_rt60(gtk_range_get_value(range));
     return gtk_range_get_value(range);
 }
 

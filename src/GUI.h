@@ -7,7 +7,9 @@
 
 #include <stdlib.h>
 #include <gtk/gtk.h>
+#include "delay_stuff.h"
 #include "main.h"
+
 
 gdouble get_wet (GtkRange *range, gpointer  user_data);
 
