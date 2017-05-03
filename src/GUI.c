@@ -33,13 +33,11 @@ typedef struct _Widget {
 	GtkWidget *PauseButton;
 } Widget;
 
-reverb_settings_s rs;
-
 gdouble get_wet (GtkRange *range,
-               gpointer  user_data)
+                reverb_settings_s *rs)
 {
     printf("Wet -> %f\n", gtk_range_get_value(range));
-    set_earlyRD(gtk_range_get_value(range));
+    rs->wetmix = gtk_range_get_value(range);
     return gtk_range_get_value(range);
 }
 
@@ -47,11 +45,7 @@ gdouble get_reflection (GtkRange *range,
                gpointer  user_data)
 {
     printf("Reflection -> %f\n", gtk_range_get_value(range));
-<<<<<<< HEAD
-    set_cutoff(gtk_range_get_value(range));
-=======
     set_earlyRD(gtk_range_get_value(range));
->>>>>>> 1b8517172c84fb84af241a768efd808b0943ef50
     return gtk_range_get_value(range);
 }
 
@@ -67,25 +61,23 @@ gdouble get_rt60 (GtkRange *range,
                gpointer  user_data)
 {
     printf("Rt60 -> %f\n", gtk_range_get_value(range));
-<<<<<<< HEAD
     set_rt60(gtk_range_get_value(range));
-=======
-  set_rt60(gtk_range_get_value(range));
->>>>>>> 1b8517172c84fb84af241a768efd808b0943ef50
     return gtk_range_get_value(range);
 }
 
 gdouble get_area (GtkRange *range,
-               gpointer  user_data)
+                reverb_settings_s *rs)
 {
     printf("Area -> %f\n", gtk_range_get_value(range));
+    rs->area = gtk_range_get_value(range);
     return gtk_range_get_value(range);
 }
 
 gdouble get_volume (GtkRange *range,
-               gpointer  user_data)
+                reverb_settings_s *rs)
 {
     printf("Volume -> %f\n", gtk_range_get_value(range));
+    rs->volume = gtk_range_get_value(range);
     return gtk_range_get_value(range);
 }
 
@@ -122,7 +114,7 @@ void file_selected_callback (GtkFileChooserButton *widget, gpointer user_data)
   file_selected(fname);
 }
 
-void init_gui(GtkWidget *MainWindow)
+void init_gui(GtkWidget *MainWindow, reverb_settings_s *rs)
 {
 	/* Variables */
 	Label *lb;
@@ -223,12 +215,12 @@ void init_gui(GtkWidget *MainWindow)
 	gtk_range_set_inverted(GTK_RANGE(Wd->VolumeWidget), TRUE);
 
 	// Set default values range
-	gtk_range_set_value (GTK_RANGE(Wd->WetWidget), 0.7);
-	gtk_range_set_value (GTK_RANGE(Wd->ReflectWidget), 0.7);
-	gtk_range_set_value (GTK_RANGE(Wd->DampWidget), 0.7);
-	gtk_range_set_value (GTK_RANGE(Wd->Rt60Widget), 3.5);
-	gtk_range_set_value (GTK_RANGE(Wd->AreaWidget), 0);
-	gtk_range_set_value (GTK_RANGE(Wd->VolumeWidget), 0);
+	gtk_range_set_value (GTK_RANGE(Wd->WetWidget), rs->wetmix);
+	gtk_range_set_value (GTK_RANGE(Wd->ReflectWidget), rs->reflect);
+	gtk_range_set_value (GTK_RANGE(Wd->DampWidget), rs->damping);
+	gtk_range_set_value (GTK_RANGE(Wd->Rt60Widget), rs->rt60);
+	gtk_range_set_value (GTK_RANGE(Wd->AreaWidget), rs->area);
+	gtk_range_set_value (GTK_RANGE(Wd->VolumeWidget), rs->volume);
 	
 	// set Entry 
 	//gtk_entry_set_buffer (GTK_ENTRY(Wd->OutputWidget), outputFileName);
@@ -238,14 +230,14 @@ void init_gui(GtkWidget *MainWindow)
 	g_signal_connect (G_OBJECT(Wd->PauseButton), "clicked", G_CALLBACK(pause_button), NULL);
 	
 	g_signal_connect(G_OBJECT(MainWindow), "delete-event", G_CALLBACK(gtk_main_quit), NULL);
-	g_signal_connect (G_OBJECT(Wd->WetWidget), "value-changed", G_CALLBACK (get_wet), NULL);
+	g_signal_connect (G_OBJECT(Wd->WetWidget), "value-changed", G_CALLBACK (get_wet), &rs->wetmix);
 	g_signal_connect(G_OBJECT(Wd->ReflectWidget), "value-changed", G_CALLBACK (get_reflection), NULL);
 	g_signal_connect(G_OBJECT(Wd->DampWidget), "value-changed", G_CALLBACK (get_damping), NULL);
 	
 	g_signal_connect(G_OBJECT(Wd->Rt60Widget), "value-changed", G_CALLBACK (get_rt60), NULL);
 	
-	g_signal_connect(G_OBJECT(Wd->AreaWidget), "value-changed", G_CALLBACK (get_area), NULL);
-	g_signal_connect(G_OBJECT(Wd->VolumeWidget), "value-changed", G_CALLBACK (get_volume), NULL);
+	g_signal_connect(G_OBJECT(Wd->AreaWidget), "value-changed", G_CALLBACK (get_area), &rs->area);
+	g_signal_connect(G_OBJECT(Wd->VolumeWidget), "value-changed", G_CALLBACK (get_volume), &rs->volume);
 
 	g_signal_connect(G_OBJECT(Wd->button_file), "file-set", G_CALLBACK(file_selected_callback), NULL);
 	gtk_container_set_border_width (GTK_CONTAINER(MainWindow), 20);

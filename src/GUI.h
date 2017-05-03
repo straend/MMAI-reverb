@@ -12,7 +12,7 @@
 #include "delay_stuff.h"
 
 
-gdouble get_wet (GtkRange *range, gpointer  user_data);
+gdouble get_wet (GtkRange *range, reverb_settings_s *rs);
 
 gdouble get_reflection (GtkRange *range, gpointer  user_data);
 
@@ -20,16 +20,16 @@ gdouble get_damping (GtkRange *range, gpointer  user_data);
 
 gdouble get_rt60 (GtkRange *range, gpointer  user_data);
 
-gdouble get_area (GtkRange *range, gpointer  user_data);
+gdouble get_area (GtkRange *range, reverb_settings_s *rs);
 
-gdouble get_volume (GtkRange *range, gpointer  user_data);
+gdouble get_volume (GtkRange *range, reverb_settings_s *rs);
 
 gboolean play_button (GtkWidget *widget, gpointer user_data);
 gboolean pause_button (GtkWidget *widget, gpointer user_data);
 
 const gchar * enter_callback( GtkWidget *widget, GtkWidget *entry );
 
-void init_gui(GtkWidget *MainWindow);
+void init_gui(GtkWidget *MainWindow, reverb_settings_s *rs);
 
 
 #endif //GUI_H

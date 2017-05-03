@@ -204,10 +204,9 @@ void parse_settings(reverb_settings_s *rs, int argc, char *argv[])
   rs->rt60 = 3.5;
   rs->wetmix = 0.7;
   rs->reflect = 0.7;
-  rs->lateRD = 0.7;
-  rs->earlyRD = 0.7;
-  rs->area = 20;
-  rs->volume = 40;
+  rs->damping = 0.7;
+  rs->area = 0;
+  rs->volume = 0;
 
     bool has_rt60 = false;
     bool has_volume_or_area = false;
@@ -311,7 +310,8 @@ int main (int argc, char *argv[])
     GtkWidget * MainWindow = NULL;
     MainWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
-    init_gui(MainWindow);
+    init_gui(MainWindow, &rs);
+    //void init_gui(GtkWidget *MainWindow, reverb_settings_s *rs);
 
 
     gtk_widget_show_all(MainWindow);
