@@ -23,7 +23,7 @@ typedef struct {
 
 float *samples;
 uint32_t  processed=0;
-#define FRAMES_PER_BUFFER (256)
+#define FRAMES_PER_BUFFER (64)
 volatile bool keep_playing = false;
 void save_outputfile(void);
 
@@ -144,6 +144,7 @@ void save_outputfile(void)
 void start_playback(void)
 {
 
+    Pa_AbortStream(stream);
   err = Pa_OpenStream(
       &stream,
       NULL,
