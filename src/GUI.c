@@ -32,12 +32,13 @@ typedef struct _Widget {
 	GtkWidget *PlayButton;
 	GtkWidget *PauseButton;
 } Widget;
+Widget * Wd;
 
 gdouble get_wet (GtkRange *range,
                 reverb_settings_s *rs)
 {
     printf("Wet -> %f\n", gtk_range_get_value(range));
-    rs->wetmix = gtk_range_get_value(range);
+    set_wetmix(gtk_range_get_value(range));
     return gtk_range_get_value(range);
 }
 
@@ -69,7 +70,9 @@ gdouble get_area (GtkRange *range,
                 reverb_settings_s *rs)
 {
     printf("Area -> %f\n", gtk_range_get_value(range));
-    rs->area = gtk_range_get_value(range);
+    float area = gtk_range_get_value(range);
+    float volume = gtk_range_get_value(GTK_RANGE(Wd->VolumeWidget));
+    gtk_range_set_value(GTK_RANGE(Wd->Rt60Widget), get_rt60_from_volume_area(volume, area));
     return gtk_range_get_value(range);
 }
 
@@ -77,7 +80,10 @@ gdouble get_volume (GtkRange *range,
                 reverb_settings_s *rs)
 {
     printf("Volume -> %f\n", gtk_range_get_value(range));
-    rs->volume = gtk_range_get_value(range);
+    //rs->volume = gtk_range_get_value(range);
+    float volume = gtk_range_get_value(range);
+    float area = gtk_range_get_value(GTK_RANGE(Wd->AreaWidget));
+    gtk_range_set_value(GTK_RANGE(Wd->Rt60Widget), get_rt60_from_volume_area(volume, area));
     return gtk_range_get_value(range);
 }
 
@@ -118,7 +124,6 @@ void init_gui(GtkWidget *MainWindow, reverb_settings_s *rs)
 {
 	/* Variables */
 	Label *lb;
-	Widget * Wd;
 	GtkWidget * InputAlign = NULL;
 	GtkWidget * table = NULL;
 
