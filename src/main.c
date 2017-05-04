@@ -25,6 +25,7 @@ float *samples;
 uint32_t  processed=0;
 #define FRAMES_PER_BUFFER (256)
 volatile bool keep_playing = false;
+void save_outputfile(void);
 
 static int paCallback(
     const void *inputBuffer, void *outputBuffer,
@@ -79,12 +80,39 @@ static void streamFinished( void* userData )
   (void) data;
   printf( "Stream Completed\n");
   keep_playing = false;
+  save_outputfile();
   finnish_moorer();
   file_selected(infilename);
 
 }
+void outputfile_selected(char *fname)
+{
+    if (infilename==NULL)
+        return;
 
-void file_selected(char *fname)
+    outfilename = fname;
+}
+
+void save_outputfile(void)
+{
+    // Save audio
+    if( NULL != outfilename) {
+        // Copy audioinfo and create outfile
+        memcpy(&sfinfo_out, &sfinfo, sizeof(SF_INFO));
+        if ((outfile = sf_open(outfilename, SFM_WRITE, &sfinfo_out)) == NULL) {
+            printf("Could not open '%s' for writing: %s\n", outfilename, sf_strerror(NULL));
+            return ;
+        }
+
+        printf("Writing output to: %s\n", outfilename);
+        sfinfo_out.frames = sfinfo.frames;
+        sf_writef_float(outfile, samples, sfinfo_out.frames);
+        sf_close(outfile);
+        outfilename = NULL;
+    }
+}
+
+    void file_selected(char *fname)
 {
   if ((infile = sf_open (fname, SFM_READ, &sfinfo)) == NULL) {
     printf("Could not open '%s' for reading: %s\n", fname, sf_strerror(NULL));
@@ -335,20 +363,7 @@ int main (int argc, char *argv[])
     }
     printf("Processed: %d\n", processed);
 
-  // Save audio
-  if( NULL != outfilename) {
-    // Copy audioinfo and create outfile
-    memcpy(&sfinfo_out, &sfinfo, sizeof(SF_INFO));
-    if ((outfile = sf_open(outfilename, SFM_WRITE, &sfinfo_out)) == NULL) {
-      printf("Could not open '%s' for writing: %s\n", outfilename, sf_strerror(NULL));
-      return 1;
-    }
 
-    printf("Writing output to: %s\n", outfilename);
-    sfinfo_out.frames = sfinfo.frames;
-    sf_writef_float(outfile, samples, sfinfo_out.frames);
-    sf_close(outfile);
-  }
 */
 
 

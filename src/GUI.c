@@ -112,6 +112,7 @@ const gchar * enter_callback( GtkWidget *widget, GtkWidget *entry )
   entry_text = gtk_entry_get_text (GTK_ENTRY (entry));
   printf ("New file name entered: %s\n", entry_text);
   //entry_text countains the new file name
+  outputfile_selected(entry_text);
   return entry_text;
 }
 void file_selected_callback (GtkFileChooserButton *widget, gpointer user_data)
