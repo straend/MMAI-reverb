@@ -34,6 +34,10 @@ const float comb_damp_freq[] = {1942, 1362, 1312, 1574, 981, 1036};
 delay_line_s dl[TAPS];
 delay_line_s comb[COMBS];
 delay_line_s dla;
+float *early_reflections;
+float *late_reflections;
+float _mixWet;
+
 
 void init_delay(delay_line_s *dl, float delay_ms,
 				float *input, SF_INFO *sf, float gain
@@ -111,6 +115,10 @@ void set_rt60(float rt60)
     float g = pow(10.0, ((-3.0 * comb_delays[c]) / (rt60 * 1000.0)));
     comb[c].gain = g;
   }
+}
+void set_wetmix(float wetmix)
+{
+    _mixWet = wetmix;
 }
 
 void init_delay_comb(delay_line_s *dl, float delay_ms,
@@ -235,9 +243,6 @@ void process_allpass_iter(float *input, const uint32_t iter)
   }
 }
 
-float *early_reflections;
-float *late_reflections;
-float _mixWet;
 
 void init_moorer(float *samples, SF_INFO *sfinfo, const uint32_t iter,
                  reverb_settings_s *rs
