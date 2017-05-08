@@ -98,9 +98,10 @@ void set_damping(float damping)
 void set_cutoff(float cutoff)
 {
   uint8_t d;
-  for(d=0;d<TAPS;d++){
-    float costh = 2.0 - cos(2.0 * M_PI * cutoff / dl[d].sf->samplerate);
-    dl[d].lp_coef = sqrt(costh * costh - 1.0) - costh;
+  for(d=0;d<COMBS;d++){
+    float costh = 2.0 - cos(2.0 * M_PI * comb_damp_freq[d]*cutoff / (float) comb[d].sf->samplerate);
+    comb[d].lp_coef = sqrt(costh * costh - 1.0) - costh;
+    printf("%d: lp_coef %f\n", d, dl[d].lp_coef);
   }
 }
 
