@@ -12,7 +12,7 @@
 #include <string.h>
 #include <math.h>
 #include <time.h>
-
+#include <stdbool.h>
 
 typedef struct{
     float *input;
@@ -40,6 +40,8 @@ typedef struct{
 
   float volume;
   float area;
+
+  bool enable_gui;
 
 } reverb_settings_s;
 

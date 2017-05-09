@@ -189,8 +189,12 @@ void print_usage(char *cmd_name)
     | |\\/| | |\\/| |/ _ \\ | |  |   / _| \\ V /| _||   / _ \\    \n\
     |_|  |_|_|  |_/_/ \\_\\___| |_|_\\___| \\_/ |___|_|_\\___/    \n\
    ┌───────────────────────────────────────────────────────┐ \n\
-   │Required parameter: audio-file to play, first argument │ \n\
    │                                                       │ \n\
+   │Required parameters:                                   │ \n\
+   |                                                       | \n\
+   │--in audiofile.wav                                     │ \n\
+   |                                                       | \n\
+   |                                                       | \n\
    │Optional parameters:     Default                       │ \n\
    |                                                       | \n\
    │--wet       [0.0-1.0]    0.7                           │ \n\
@@ -208,7 +212,7 @@ void print_usage(char *cmd_name)
    │--out       filename to write Reverbed audio (wav)     │ \n\
    │                                                       │ \n\
    │Example:                                               │ \n\
-   │%s ../audio/saxGandalf.wav --dry 0.6 --rt60 5.3    │ \n\
+   │%s -in ../audio/saxGandalf.wav --dry 0.6 --rt60 5.3│ \n\
    │                                                       │ \n\
    │                                                       │ \n\
    └───────────────────────────────────────────────────────┘ \n\
@@ -222,6 +226,7 @@ void parse_settings(reverb_settings_s *rs, int argc, char *argv[])
       ARG_WAIT,
       ARG_WET_SIGNAL,
       ARG_SIZE,
+      ARG_INFILE,
       ARG_OUTFILE,
       ARG_AREA,
       ARG_VOLUME,
@@ -236,11 +241,11 @@ void parse_settings(reverb_settings_s *rs, int argc, char *argv[])
   rs->damping = 0.7;
   rs->area = 0;
   rs->volume = 0;
-
+  rs->enable_gui = true;
     bool has_rt60 = false;
     bool has_volume_or_area = false;
     uint8_t i;
-    for(i=2;i<argc; i++){
+    for(i=1;i<argc; i++){
     if(strncmp("--",argv[i], 2)==0){
       char *c = argv[i];
       c++;c++;
@@ -256,6 +261,9 @@ void parse_settings(reverb_settings_s *rs, int argc, char *argv[])
       } else if (strncmp("out", c, 3)==0){
         c_state = ARG_OUTFILE;
 
+      } else if (strncmp("in", c, 2)==0){
+        c_state = ARG_INFILE;
+
       } else if (strncmp("area", c, 4)==0){
         c_state = ARG_AREA;
 
@@ -264,6 +272,9 @@ void parse_settings(reverb_settings_s *rs, int argc, char *argv[])
 
       } else if (strncmp("damping", c, 7)==0){
         c_state = ARG_DAMPING;
+
+      } else if (strncmp("no-gui", c, 6)==0){
+        rs->enable_gui = false;
       }
 
     } else {
@@ -290,9 +301,13 @@ void parse_settings(reverb_settings_s *rs, int argc, char *argv[])
         has_rt60 = true;
         break;
 
-      case ARG_OUTFILE:
-        outfilename = argv[i];
-        break;
+        case ARG_OUTFILE:
+          outfilename = argv[i];
+          outputfile_selected(outfilename);
+          break;
+        case ARG_INFILE:
+          infilename = argv[i];
+          break;
       default:
       break;
       }
@@ -333,18 +348,32 @@ int main (int argc, char *argv[])
 
     printf( "Device: %s\n", deviceInfo->name );
     memset (&sfinfo, 0, sizeof (sfinfo)) ;
-  /* Initialisation of GTK+ */
-    gtk_init(&argc, &argv);
-    /* Creation of the window */
-    GtkWidget * MainWindow = NULL;
-    MainWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
-    init_gui(MainWindow, &rs);
-    //void init_gui(GtkWidget *MainWindow, reverb_settings_s *rs);
+    if(rs.enable_gui) {
+      /* Initialisation of GTK+ */
+      gtk_init(&argc, &argv);
+      /* Creation of the window */
+      GtkWidget *MainWindow = NULL;
+      MainWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+
+      init_gui(MainWindow, &rs);
+      //void init_gui(GtkWidget *MainWindow, reverb_settings_s *rs);
 
 
-    gtk_widget_show_all(MainWindow);
-    gtk_main();
+      gtk_widget_show_all(MainWindow);
+      gtk_main();
+    } else if (infilename!=NULL){
+      file_selected(infilename);
+      start_playback();
+      // Wait until we have played all samples
+      keep_playing = true;
+      bool changed = false;
+      while (keep_playing){
+
+      }
+    } else {
+      print_usage(argv[0]);
+    }
 
   /*
     // Wait until we have played all samples
