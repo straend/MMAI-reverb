@@ -189,12 +189,12 @@ void init_early(float *samples, SF_INFO *sfinfo, float earlyRD)
   }
 }
 
-void init_combs(float *samples, SF_INFO *sfinfo, float rt60, float damping)
+void init_combs(float *samples, SF_INFO *sfinfo, float rt60, float cutoff)
 {
   uint8_t c;
   for (c = 0; c < COMBS; c++) {
     float g = pow(10.0, ((-3.0 * comb_delays[c]) / (rt60 * 1000.0)));
-    init_delay_comb(&comb[c], comb_delays[c], samples, sfinfo, g, comb_damp_freq[c]*damping);
+    init_delay_comb(&comb[c], comb_delays[c], samples, sfinfo, g, comb_damp_freq[c]*cutoff);
   }
 }
 
