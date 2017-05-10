@@ -54,7 +54,7 @@ gdouble get_damping (GtkRange *range,
                gpointer  user_data)
 {
     printf("Damping -> %f\n", gtk_range_get_value(range));
-    set_damping(gtk_range_get_value(range));
+    set_cutoff(gtk_range_get_value(range));
     return gtk_range_get_value(range);
 }
 
