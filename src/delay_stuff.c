@@ -189,7 +189,7 @@ void init_early(float *samples, SF_INFO *sfinfo, float earlyRD)
   }
 }
 
-void init_combs(float *samples, SF_INFO *sfinfo, float rt60, float damping)
+void init_combs(float *samples, SF_INFO *sfinfo, float rt60, float cutoff)
 {
   uint8_t c;
   for (c = 0; c < COMBS; c++) {
