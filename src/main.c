@@ -211,6 +211,10 @@ void print_usage(char *cmd_name)
    │                                                       │ \n\
    │--out       filename to write Reverbed audio (wav)     │ \n\
    │                                                       │ \n\
+   │--no-gui    disables the use of GTK+3 GUI              │ \n\
+   │                                                       │ \n\
+   │--help      shows this help                            │ \n\
+   │                                                       │ \n\
    │Example:                                               │ \n\
    │%s -in ../audio/saxGandalf.wav --dry 0.6 --rt60 5.3│ \n\
    │                                                       │ \n\
@@ -274,9 +278,10 @@ void parse_settings(reverb_settings_s *rs, int argc, char *argv[])
         c_state = ARG_DAMPING;
 
       } else if (strncmp("no-gui", c, 6)==0){
-        rs->enable_gui = false;
+          rs->enable_gui = false;
+      } else if (strncmp("help", c, 4)==0){
+          rs->enable_gui = false;
       }
-
     } else {
       switch (c_state) {
       case ARG_WET_SIGNAL:
