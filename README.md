@@ -17,8 +17,10 @@ Implement a reverb algorithm in C/C++.
     * have a CLI
     * be runnable on at least Linux
 * Libraries that have to be used for sound file and audio I/O:
-    * libsndfile
-    * portaudio
+    * [libsndfile](http://www.mega-nerd.com/libsndfile/)
+    * [portaudio](http://www.portaudio.com/)
+* Libraries for UI
+    * [GTK+3](https://www.gtk.org/documentation.php)
     
 ## Milestones
 * Week 15: [project plan](https://github.com/straend/MMAI-reverb/blob/master/docs/milestone1.md)
@@ -49,7 +51,7 @@ Implement a reverb algorithm in C/C++.
       * last session
       * listening test of the reverb
       * submission of the project online one day before the course presentation
-    * Thursday:
+    * [Thursday presentation](https://straend.github.io/MMAI-reverb/Presentation.html):
       * address the rubric topics as best as possible
       * explain:
         * Why were different algorithm blocks used?
